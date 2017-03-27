@@ -10,13 +10,11 @@
 
 ### 配置数据库
 
-> static function DbConfig::bind(string $app, array $config) void
+> static function Model::config(array $config) void
 
-1. $app为对应服务名称。
+$config为MySQL配置数据，格式为\[$host, $port, $user, $password, $db_name\]。
 
-2. $config为MySQL配置数据，格式为\[$host, $port, $user, $password, $db_name\]。
-
-数据库配置绑定服务后，在模型中操作数据库时，Acast\\Model会自动维持数据库连接。
+一般，数据库配置和初始化工作在在start回调中进行。
 
 ### 操作数据库
 

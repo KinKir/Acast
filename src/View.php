@@ -7,6 +7,11 @@ namespace Acast;
  */
 abstract class View {
     /**
+     * 服务名
+     * @var string
+     */
+    protected static $_app = null;
+    /**
      * 共享内存句柄
      * @var resource
      */
@@ -40,10 +45,13 @@ abstract class View {
         $this->_controller = $controller;
     }
     /**
-     * 初始化共享内存
+     * 初始化
+     *
+     * @param string $app
      */
-    static function init() {
+    static function init(string $app) {
         self::$_shm = shm_attach(ftok(__FILE__, 'v'), SHM_SIZE);
+        self::$_app = $app;
     }
     /**
      * 销毁共享内存

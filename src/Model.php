@@ -8,10 +8,15 @@ use Workerman\MySQL\Connection;
  */
 abstract class Model {
     /**
-     * 应用名称
+     * 服务名
      * @var string
      */
     protected static $_app = null;
+    /**
+     * 数据库配置项
+     * @var array
+     */
+    protected static $_config = [];
     /**
      * 绑定的数据表
      * @var string|null
@@ -29,6 +34,16 @@ abstract class Model {
      */
     static function init(string $app) {
         self::$_app = $app;
+    }
+    /**
+     * 配置数据库连接
+     *
+     * @param array $config
+     */
+    static function config(array $config) {
+        if (isset(self::$_config))
+            Console::Warning("Overwriting database configuration for app \"$app\".");
+        self::$_config = $config;
     }
     /**
      * MySQL SELECT
@@ -95,7 +110,7 @@ abstract class Model {
      */
     static function Db() : Connection {
         if (!isset(self::$_connection)) {
-            [$host, $port, $user, $password, $db_name] = DbConfig::get(self::$_app);
+            [$host, $port, $user, $password, $db_name] = self::$_config;
             self::$_connection = new Connection($host, $port, $user, $password, $db_name);
         }
         return self::$_connection;

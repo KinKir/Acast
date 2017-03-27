@@ -149,6 +149,8 @@ class Server {
      */
     function onServerStart(Worker $worker) {
         Model::init($this->name);
+        View::init($this->name);
+        Controller::init($this->name);
         if (is_callable($this->_on_stop))
             call_user_func($this->_on_stop, $worker);
     }
@@ -164,12 +166,8 @@ class Server {
     }
     /**
      * 启动所有服务
-     * @param callable|null $callback
      */
-    static function start(?callable $callback = null) {
-        View::init();
-        if (is_callable($callback))
-            $callback();
+    static function start() {
         Worker::runAll();
     }
 }

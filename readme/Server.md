@@ -66,8 +66,6 @@ Server::app('Demo')->config([
 
 ### 启动服务
 
-> static function Server::start(?callable $callback = null) void
+> static function Server::start() void
 
 执行服务启动前的初始化操作，并调用Worker::runAll()方法，启动所有Worker。
-
-全局的初始化操作建议在该方法的回调中进行。

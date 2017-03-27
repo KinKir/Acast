@@ -173,6 +173,13 @@ class Server {
      * 启动所有服务
      */
     static function start() {
+        if (count($_SERVER['argv']) > 1) {
+            $name = $_SERVER['argv'];
+            if (in_array($name, Console::$callbacks)) {
+                Console::call($name, array_slice($_SERVER['argv'], 2));
+                exit(0);
+            }
+        }
         Worker::runAll();
     }
 }

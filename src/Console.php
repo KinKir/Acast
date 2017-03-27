@@ -12,6 +12,11 @@ abstract class Console {
      */
     protected static $_stdin = null;
     /**
+     * 控制台函数列表
+     * @var array
+     */
+    static $callbacks = [];
+    /**
      * 触发致命错误
      *
      * @param string $msg
@@ -51,5 +56,30 @@ abstract class Console {
         if (isset(self::$_stdin))
             self::$_stdin = fopen('php://stdin', 'r');
         return rtrim(fgets(self::$_stdin));
+    }
+    /**
+     * 注册控制台函数
+     *
+     * @param string $name
+     * @param callable $callback
+     */
+    static function register(string $name, callable $callback) {
+        if (isset(self::$callbacks[$name])) {
+            self::Notice("Overwriting console callback \"$name\".");
+        }
+        self::$callbacks[$name] = $callback;
+    }
+    /**
+     * 调用控制台函数
+     *
+     * @param string $name
+     * @param array $params
+     */
+    static function call(string $name, array $params) {
+        if (!isset(self::$callbacks[$name])) {
+            self::Warning("Console callback \"$name\" do not exist.");
+        }
+        $callback = self::$callbacks[$name];
+        $callback($params);
     }
 }

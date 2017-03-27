@@ -7,11 +7,6 @@ namespace Acast;
  */
 abstract class Controller {
     /**
-     * 服务名
-     * @var string
-     */
-    protected static $_app = null;
-    /**
      * 中间件返回信息
      * @var mixed
      */
@@ -43,22 +38,14 @@ abstract class Controller {
      */
     function __construct(Router $route) {
         $temp = explode('\\', get_called_class());
-        $name = self::$_app.'\\Model\\'.end($temp);
+        $name = Server::$name.'\\Model\\'.end($temp);
         if (class_exists($name))
-            $this->model = new $name;
-        $name = self::$_app.'\\View\\'.end($temp);
+            $this->model = new $name();
+        $name = Server::$name.'\\View\\'.end($temp);
         if (class_exists($name))
             $this->view = new $name($this);
         $this->urlParams = $route->urlParams ?? [];
         $this->retMsg = $route->retMsg ?? null;
         $this->filterMsg = $route->filterMsg ?? null;
-    }
-    /**
-     * 初始化
-     *
-     * @param string $app
-     */
-    static function init(string $app) {
-        self::$_app = $app;
     }
 }

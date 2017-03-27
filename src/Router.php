@@ -27,11 +27,6 @@ class Router {
      */
     protected $_pCall = null;
     /**
-     * 服务名
-     * @var string
-     */
-    protected $_app = null;
-    /**
      * GET参数
      * @var array
      */
@@ -46,13 +41,6 @@ class Router {
      * @var mixed
      */
     public $retMsg = null;
-    /**
-     * 构造函数
-     * @param string $app
-     */
-    function __construct(string $app) {
-        $this->_app = $app;
-    }
     /**
      * 注册路由。
      *
@@ -113,10 +101,7 @@ class Router {
      * @param string $method
      */
     function locate(array $path, string $method) {
-        unset($this->_pCall);
-        unset($this->urlParams);
-        unset($this->retMsg);
-        unset($this->filterMsg);
+        unset($this->_pCall, $this->urlParams, $this->retMsg, $this->filterMsg);
         if (!isset($this->_tree[$method])) {
             $this->retMsg = Respond::Err(400, 'Invalid method.');
             return;
@@ -130,23 +115,22 @@ class Router {
                 $this->urlParams[$this->_pCall['/name']] = $value;
             } else goto Err;
         }
-        Loop: {
-            if (isset($this->_pCall['/func'])) {
-                $this->call();
-                return;
-            }
-            if (isset($this->_pCall['/var'])) {
-                $this->_pCall = &$this->_pCall['/var'];
-                $this->urlParams[$this->_pCall['/name']] = '';
-            } else goto Err;
-        } goto Loop;
-        Err: {
-            if (isset($this->_tree['/404']['/func'])) {
-                $this->_pCall = $this->_tree['/404'];
-                $this->call();
-            } else
-                $this->retMsg = Respond::Err(404, 'Not found.');
+        Loop:
+        if (isset($this->_pCall['/func'])) {
+            $this->call();
+            return;
         }
+        if (isset($this->_pCall['/var'])) {
+            $this->_pCall = &$this->_pCall['/var'];
+            $this->urlParams[$this->_pCall['/name']] = '';
+        } else goto Err;
+        goto Loop;
+        Err:
+        if (isset($this->_tree['/404']['/func'])) {
+            $this->_pCall = $this->_tree['/404'];
+            $this->call();
+        } else
+            $this->retMsg = Respond::Err(404, 'Not found.');
     }
     /**
      * 路由分发。
@@ -220,7 +204,7 @@ class Router {
     function invoke($param = null) {
         $class = $this->_pCall['/ctrl'][0];
         $method = $this->_pCall['/ctrl'][1];
-        $object = new $class($this->_app, $this);
+        $object = new $class(Server::$name, $this);
         $ret = $object->$method($param);
         $this->retMsg = $object->retMsg;
         return $ret;
@@ -237,7 +221,7 @@ class Router {
             Console::Warning("No route to bind.");
             return $this;
         }
-        $controller = $this->_app .'\\Controller\\' . $controller;
+        $controller = Server::$name.'\\Controller\\'.$controller;
         if (!class_exists($controller) || !is_subclass_of($controller, Controller::class)) {
             Console::Warning("Invalid controller \"$controller\".");
             return $this;
@@ -270,7 +254,7 @@ class Router {
                 if (!($callback instanceof \Closure))
                     $callback = \Closure::fromCallable($callback);
                 $callback = \Closure::bind($callback, $this, __CLASS__);
-                $this->_pSet[$type == IN_FILTER ? '/in' : '/out'][] = $callback;
+                $this->_pSet[$type == Filter::_IN_ ? '/in' : '/out'][] = $callback;
             }
         }
         return $this;

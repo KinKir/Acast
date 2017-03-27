@@ -8,11 +8,6 @@ use Workerman\MySQL\Connection;
  */
 abstract class Model {
     /**
-     * 服务名
-     * @var string
-     */
-    protected static $_app = null;
-    /**
      * 数据库配置项
      * @var array
      */
@@ -28,21 +23,13 @@ abstract class Model {
      */
     protected static $_connection = null;
     /**
-     * 初始化
-     *
-     * @param string $app
-     */
-    static function init(string $app) {
-        self::$_app = $app;
-    }
-    /**
      * 配置数据库连接
      *
      * @param array $config
      */
     static function config(array $config) {
         if (isset(self::$_config))
-            Console::Warning('Overwriting database configuration for app \"'.self::$_app.'\".');
+            Console::Warning('Overwriting database configuration for app \"'.Server::$name.'\".');
         self::$_config = $config;
     }
     /**

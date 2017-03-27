@@ -43,7 +43,12 @@ class Server {
      * 服务名
      * @var string
      */
-    public $name = null;
+    protected $_name = null;
+    /**
+     * 服务名（进程空间）
+     * @var string
+     */
+    public static $name = null;
     /**
      * 构造函数
      * .
@@ -51,12 +56,13 @@ class Server {
      * @param int $listen
      */
     protected function __construct(string $name, int $listen) {
-        $this->name = $name;
+        $this->_name = $name;
         $this->_worker = new Worker('http://[::]:'.$listen);
         $this->_worker->onWorkerStart = [$this, 'onServerStart'];
         $this->_worker->onWorkerStop = [$this, 'onServerStop'];
         $this->_worker->onMessage = [$this, 'onMessage'];
-        $this->_route = new Router($name);
+        $this->config(DEFAULT_WORKER_CONFIG);
+        $this->_route = new Router();
     }
     /**
      * 配置Workerman
@@ -148,9 +154,8 @@ class Server {
      * @param Worker $worker
      */
     function onServerStart(Worker $worker) {
-        Model::init($this->name);
-        View::init($this->name);
-        Controller::init($this->name);
+        View::init();
+        Server::$name = $this->_name;
         if (is_callable($this->_on_stop))
             call_user_func($this->_on_stop, $worker);
     }

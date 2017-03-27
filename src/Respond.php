@@ -21,11 +21,11 @@ abstract class Respond {
     /**
      * 格式化为JSON
      *
-     * @param array $arr
-     * @param int $code
+     * @param array $data
+     * @param int $err
      * @return string
      */
-    static function Json(array $arr, int $code) {
-        return json_encode(['code' => $code] + $arr);
+    static function Json(array $data, int $err = 0) {
+        return json_encode(['err' => $err] + $data);
     }
 }

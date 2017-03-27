@@ -7,11 +7,6 @@ namespace Acast;
  */
 abstract class View {
     /**
-     * 服务名
-     * @var string
-     */
-    protected static $_app = null;
-    /**
      * 共享内存句柄
      * @var resource
      */
@@ -46,19 +41,19 @@ abstract class View {
     }
     /**
      * 初始化
-     *
-     * @param string $app
      */
-    static function init(string $app) {
-        self::$_shm = shm_attach(ftok(__FILE__, 'v'), SHM_SIZE);
-        self::$_app = $app;
+    static function init() {
+        if (USE_SHM)
+            self::$_shm = shm_attach(ftok(__FILE__, 'v'), SHM_SIZE);
     }
     /**
      * 销毁共享内存
      */
     static function destroy() {
-        shm_remove(self::$_shm);
-        shm_detach(self::$_shm);
+        if (is_resource(self::$_shm)) {
+            shm_remove(self::$_shm);
+            shm_detach(self::$_shm);
+        }
     }
     /**
      * 注册视图
@@ -72,13 +67,12 @@ abstract class View {
             Console::Warning("Register view \"$name\" failed. Already exists.");
             return;
         }
-        if ($use_shm) {
+        if (USE_SHM && $use_shm) {
             ++self::$_shm_id_count;
             shm_put_var(self::$_shm, self::$_shm_id_count, $data);
             self::$_templates[$name] = self::$_shm_id_count;
-        } else {
+        } else
             self::$_templates[$name] = $data;
-        }
     }
     /**
      * 获取视图
@@ -91,7 +85,7 @@ abstract class View {
             Console::Warning("View \"$name\" not exist.");
             return $this;
         }
-        if (is_integer(self::$_templates[$name]))
+        if (USE_SHM && is_integer(self::$_templates[$name]))
             $this->_temp = shm_get_var(self::$_shm, self::$_templates[$name]);
         else
             $this->_temp = self::$_templates[$name];
@@ -111,21 +105,21 @@ abstract class View {
     /**
      * 生成JSON
      *
-     * @param array $arr
-     * @param int $code
+     * @param array $data
+     * @param int $err
      * @return self
      */
-    function json(array $arr, int $code = 0) : self {
-        $this->_temp = Respond::Json($arr, $code);
+    function json(array $data, int $err = 0) : self {
+        $this->_temp = Respond::Json($data, $err);
         return $this;
     }
     /**
      * 将视图回传给控制器
      */
     function show() {
-        if (!isset($this->_temp)) {
+        if (!isset($this->_temp))
             $this->_controller->retMsg = Respond::Err(500, 'Server failed to give any response.');
-        }
-        $this->_controller->retMsg = $this->_temp;
+        else
+            $this->_controller->retMsg = $this->_temp;
     }
 }

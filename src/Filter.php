@@ -7,6 +7,14 @@ namespace Acast;
  */
 abstract class Filter {
     /**
+     * 输入过滤
+     */
+    const _IN_ = 0;
+    /**
+     * 输出过滤
+     */
+    const _OUT_ = 1;
+    /**
      * 前驱中间件，将在路由回调之前被调用。
      * @var array
      */
@@ -23,10 +31,10 @@ abstract class Filter {
      * @param int $type
      * @param callable $callback
      */
-    static function register(string $name, int $type = IN_FILTER, callable $callback) {
-        if ($type == IN_FILTER ? isset(self::$_inFilters[$name]) : isset(self::$_outFilters[$name]))
+    static function register(string $name, int $type = self::_IN_, callable $callback) {
+        if ($type == self::_IN_ ? isset(self::$_inFilters[$name]) : isset(self::$_outFilters[$name]))
             Console::Notice("Overwriting filter callback \"$name\".");
-        if ($type == IN_FILTER)
+        if ($type == self::_IN_)
             self::$_inFilters[$name] = $callback;
         else
             self::$_outFilters[$name] = $callback;
@@ -38,11 +46,11 @@ abstract class Filter {
      * @param int $type
      * @return callable|null
      */
-    static function fetch(string $name, int $type = IN_FILTER) : ?callable {
-        if ($type == IN_FILTER ? !isset(self::$_inFilters[$name]) : !isset(self::$_outFilters[$name])) {
+    static function fetch(string $name, int $type = self::_IN_) : ?callable {
+        if ($type == self::_IN_ ? !isset(self::$_inFilters[$name]) : !isset(self::$_outFilters[$name])) {
             Console::Warning("Failed to fetch filter \"$name\". Not exist.");
             return null;
         }
-        return $type == IN_FILTER ? self::$_inFilters[$name] : self::$_outFilters[$name];
+        return $type == self::_IN_ ? self::$_inFilters[$name] : self::$_outFilters[$name];
     }
 }

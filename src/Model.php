@@ -42,7 +42,7 @@ abstract class Model {
      */
     static function config(array $config) {
         if (isset(self::$_config))
-            Console::Warning("Overwriting database configuration for app \"$app\".");
+            Console::Warning('Overwriting database configuration for app \"'.self::$_app.'\".');
         self::$_config = $config;
     }
     /**

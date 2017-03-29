@@ -102,7 +102,7 @@ class Server {
      * @param TcpConnection $connection
      */
     function onMessage(TcpConnection $connection) {
-        $this->_connection = $connection;
+        $this->_route->connection = $this->_connection = $connection;
         $path = explode('/', substr($_SERVER['REQUEST_URI'], 1));
         if (empty($path[0]) && count($path) == 1)
             $path = [];
@@ -174,8 +174,8 @@ class Server {
      */
     static function start() {
         if (count($_SERVER['argv']) > 1) {
-            $name = $_SERVER['argv'];
-            if (in_array($name, Console::$callbacks)) {
+            $name = $_SERVER['argv'][1];
+            if (in_array($name, array_keys(Console::$callbacks))) {
                 Console::call($name, array_slice($_SERVER['argv'], 2));
                 exit(0);
             }

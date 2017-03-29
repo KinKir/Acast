@@ -1,6 +1,8 @@
 <?php
 
 namespace Acast;
+use Workerman\Connection\TcpConnection;
+
 /**
  * 路由
  * @package Acast
@@ -41,6 +43,11 @@ class Router {
      * @var mixed
      */
     public $retMsg = null;
+    /**
+     * 连接实例
+     * @var TcpConnection
+     */
+    public $connection = null;
     /**
      * 注册路由。
      *
@@ -165,6 +172,9 @@ class Router {
             if (!($in_filter() ?? true))
                 break;
         }
+        $status = $this->connection->getStatus();
+        if ($status === TcpConnection::STATUS_CLOSING || $status === TcpConnection::STATUS_CLOSED)
+            return false;
         $callback = $this->_pCall['/func'];
         $ret = $callback() ?? true;
         foreach ($this->_pCall['/out'] as $out_filter) {
@@ -198,12 +208,17 @@ class Router {
     /**
      * 调用已注册的控制器中的方法。
      *
-     * @param null $param
+     * @param string $name
+     * @param mixed $param
      * @return mixed
      */
-    function invoke($param = null) {
-        $class = $this->_pCall['/ctrl'][0];
-        $method = $this->_pCall['/ctrl'][1];
+    function invoke(string $name, $param = null) {
+        if (!isset($this->_pCall['/ctrl'][$name])) {
+            Console::Warning("Invalid controller binding.\"$name\"");
+            return false;
+        }
+        $class = $this->_pCall['/ctrl'][$name][0];
+        $method = $this->_pCall['/ctrl'][$name][1];
         $object = new $class(Server::$name, $this);
         $ret = $object->$method($param);
         $this->retMsg = $object->retMsg;
@@ -212,11 +227,12 @@ class Router {
     /**
      * 绑定控制器及方法
      *
+     * @param string $name
      * @param string $controller
      * @param string $method
      * @return Router
      */
-    function bind(string $controller, string $method) : self {
+    function bind(string $name, string $controller, string $method) : self {
         if (!isset($this->_pSet)) {
             Console::Warning("No route to bind.");
             return $this;
@@ -230,7 +246,9 @@ class Router {
             Console::Warning("Invalid method \"$method\".");
             return $this;
         }
-        $this->_pSet['/ctrl'] = [$controller, $method];
+        if (isset($this->_pSet['/ctrl'][$name]))
+            Console::Warning("Overwriting controller binding \"$name\"");
+        $this->_pSet['/ctrl'][$name] = [$controller, $method];
         return $this;
     }
     /**

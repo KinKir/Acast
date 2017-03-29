@@ -240,7 +240,14 @@ class TcpConnection extends ConnectionInterface
         $this->maxSendBufferSize = self::$defaultMaxSendBufferSize;
         $this->_remoteAddress    = $remote_address;
     }
-
+    /**
+     * Get connection status.
+     *
+     * @return int
+     */
+    public function getStatus() {
+        return $this->_status;
+    }
     /**
      * Sends data on the connection.
      *

@@ -16,17 +16,19 @@ Acast提供了当所有路由都无法匹配的时候自动匹配的路由。$pa
 
 ### 绑定控制器
 
-> function Router::bind(string $controller, string $method) Router 
+> function Router::bind(string $name, string $controller, string $method) Router 
 
-1. $controller为绑定的控制器的类名。该类必须继承Acast\\Controller。
+1. 一个路由可以绑定多个控制器，$name为绑定名。
 
-2. $method为控制器的方法。
+2. $controller为绑定的控制器的类名。该类必须继承Acast\\Controller。
+
+3. $method为控制器的方法。
 
 若一个路由绑定了控制器，则可以在回调函数中用以下方法调用。该类的构造函数会先被调用，然后是指定的方法。
 
-> function Router::invoke($param = null) mixed 
+> function Router::invoke(string $name, $param = null) mixed 
   
-可以传递一个参数，也可以获取控制器方法的返回值。
+可以向控制器方法传递一个参数，也可以获取控制器方法的返回值。
 
 ### 绑定中间件
 
@@ -55,6 +57,8 @@ $name支持数组。这种情况下，数组中每个路由的回调函数将被
 2. $this-\>filterMsg: 建议用该变量保存中间件的返回值以便其他中间件、路由或者控制器使用。
 
 3. $this-\>retMsg: 路由回调结束后返回给用户的数据。
+
+4. $this-\>connection: 与客户端的连接实例。一般用于在输入中间件中直接输出错误信息并关闭连接。不建议在路由回调或输出中间件中使用。由于关闭连接的操作是异步的，因此调用$this-\>connection-\>close()时后应直接返回false，否则可能出现不可预料的错误。
 
 ### 示例
 

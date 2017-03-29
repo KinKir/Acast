@@ -20,7 +20,7 @@ php main.php clear user room
 
 函数执行后，脚本会立即停止运行，不会启动Workerman服务。
 
-如果函数名没有匹配，则参数会原封不动地交给Workerman处理。
+如果函数名没有匹配，则参数会交给Workerman处理。如start，stop等。因此，不要注册和Workerman冲突的参数。
 
 ### 响应
 

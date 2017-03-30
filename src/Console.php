@@ -21,7 +21,7 @@ abstract class Console {
      *
      * @param string $msg
      */
-    static function Fatal(string $msg) {
+    static function fatal(string $msg) {
         trigger_error($msg, E_USER_ERROR);
     }
     /**
@@ -29,7 +29,7 @@ abstract class Console {
      *
      * @param string $msg
      */
-    static function Warning(string $msg) {
+    static function warning(string $msg) {
         trigger_error($msg, E_USER_WARNING);
     }
     /**
@@ -37,7 +37,7 @@ abstract class Console {
      *
      * @param string $msg
      */
-    static function Notice(string $msg) {
+    static function notice(string $msg) {
         trigger_error($msg, E_USER_NOTICE);
     }
     /**
@@ -45,7 +45,7 @@ abstract class Console {
      *
      * @param string $msg
      */
-    static function Println(string $msg) {
+    static function println(string $msg) {
         echo $msg, PHP_EOL;
     }
     /**
@@ -64,9 +64,8 @@ abstract class Console {
      * @param callable $callback
      */
     static function register(string $name, callable $callback) {
-        if (isset(self::$callbacks[$name])) {
-            self::Notice("Overwriting console callback \"$name\".");
-        }
+        if (isset(self::$callbacks[$name]))
+            self::notice("Overwriting console callback \"$name\".");
         self::$callbacks[$name] = $callback;
     }
     /**
@@ -76,9 +75,8 @@ abstract class Console {
      * @param array $params
      */
     static function call(string $name, array $params) {
-        if (!isset(self::$callbacks[$name])) {
-            self::Warning("Console callback \"$name\" do not exist.");
-        }
+        if (!isset(self::$callbacks[$name]))
+            self::warning("Console callback \"$name\" do not exist.");
         $callback = self::$callbacks[$name];
         $callback($params);
     }

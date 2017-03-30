@@ -14,7 +14,7 @@ abstract class Respond {
      * @param string $msg
      * @return string
      */
-    static function Err(int $code, string $msg) {
+    static function err(int $code, string $msg) {
         Http::header($code);
         return $msg;
     }
@@ -25,7 +25,7 @@ abstract class Respond {
      * @param int $err
      * @return string
      */
-    static function Json(array $data, int $err = 0) {
+    static function json(array $data, int $err = 0) {
         return json_encode(['err' => $err] + $data);
     }
 }

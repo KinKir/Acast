@@ -10,13 +10,13 @@
 
 ### 注册视图
 
-> static function View::register(string $name, $data, bool $use_shm = false) void
+> static function View::register(string $name, $data, bool $use_memcached = false) void
 
 1. $name为视图名。
 
 2. $data为视图内容，可以为字符串或者对象。支持[Plates](http://platesphp.com/)等模版。
 
-3. 是否使用共享内存。该选项一般用于需要跨进程、跨服务共享，而内存占用较高的视图模版。
+3. 是否使用Memcached。该选项一般用于需要跨进程、跨服务共享，而内存占用较高的视图模版。
 
 ### 取出视图
 

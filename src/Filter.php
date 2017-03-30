@@ -33,7 +33,7 @@ abstract class Filter {
      */
     static function register(string $name, int $type = self::_IN_, callable $callback) {
         if ($type == self::_IN_ ? isset(self::$_inFilters[$name]) : isset(self::$_outFilters[$name]))
-            Console::Notice("Overwriting filter callback \"$name\".");
+            Console::notice("Overwriting filter callback \"$name\".");
         if ($type == self::_IN_)
             self::$_inFilters[$name] = $callback;
         else
@@ -48,7 +48,7 @@ abstract class Filter {
      */
     static function fetch(string $name, int $type = self::_IN_) : ?callable {
         if ($type == self::_IN_ ? !isset(self::$_inFilters[$name]) : !isset(self::$_outFilters[$name])) {
-            Console::Warning("Failed to fetch filter \"$name\". Not exist.");
+            Console::warning("Failed to fetch filter \"$name\". Not exist.");
             return null;
         }
         return $type == self::_IN_ ? self::$_inFilters[$name] : self::$_outFilters[$name];

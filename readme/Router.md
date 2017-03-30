@@ -16,13 +16,13 @@ Acast提供了当所有路由都无法匹配的时候自动匹配的路由。$pa
 
 ### 绑定控制器
 
-> function Router::bind(string $name, string $controller, string $method) Router 
+> function Router::bind(array $controllers) Router 
 
-1. 一个路由可以绑定多个控制器，$name为绑定名。
+1. 一个路由可以绑定多个控制器，$controller为数组，可以为单个控制器或多个控制器，格式为\[string $name, string $controller, string $method\]。
 
 2. $controller为绑定的控制器的类名。该类必须继承Acast\\Controller。
 
-3. $method为控制器的方法。
+3. $name为标识绑定的名称（用于invoke调用），$method为控制器的方法。
 
 若一个路由绑定了控制器，则可以在回调函数中用以下方法调用。该类的构造函数会先被调用，然后是指定的方法。
 
@@ -36,9 +36,9 @@ Acast提供了当所有路由都无法匹配的时候自动匹配的路由。$pa
 
 ### 路由别名
 
-> function Router::alias(string $name) Router
+> function Router::alias(mixed $name) Router
 
-$name为你将要给该路由设置的别名。给路由设置别名后可以实现路由的分发。
+$name为你将要给该路由设置的别名（以数组的形式可以同时设置多个别名）。给路由设置别名后可以实现路由的分发。
 
 注意，如果你希望别名路由不保留绑定的中间件和控制器，你需要在filter和bind方法之前调用该方法。
 
@@ -75,5 +75,5 @@ Server::app('Demo')->route(['user'], 'POST', function () {
     if ($this->filterMsg) {
         $this->invoke();
     }
-})->filter(['auth' => \Acast\IN_FILTER])->bind('User', 'showName')->alias('user');
+})->filter(['auth' => \Acast\IN_FILTER])->bind(['showUserName', 'User', 'showName'])->alias('user');
 ```

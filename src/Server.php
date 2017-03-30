@@ -45,13 +45,18 @@ class Server {
      */
     protected $_name = null;
     /**
+     * Memcached实例
+     * @var \Memcached
+     */
+    public static $memcache = null;
+    /**
      * 服务名（进程空间）
      * @var string
      */
     public static $name = null;
     /**
      * 构造函数
-     * .
+     *
      * @param string $name
      * @param int $listen
      */
@@ -82,7 +87,7 @@ class Server {
      */
     static function app(string $app) : self {
         if (!isset(self::$_apps[$app]))
-            Console::Fatal("Failed to fetch app. App \"$app\" not exist!");
+            Console::fatal("Failed to fetch app. App \"$app\" not exist!");
         return self::$_apps[$app];
     }
     /**
@@ -93,7 +98,7 @@ class Server {
      */
     static function create(string $app, string $listen) {
         if (isset(self::$_apps[$app]))
-            Console::Fatal("Failed to create app. App \"$app\" exists!");
+            Console::fatal("Failed to create app. App \"$app\" exists!");
         self::$_apps[$app] = new self($app, $listen);
     }
     /**
@@ -117,7 +122,7 @@ class Server {
      */
     function event(string $event, callable $callback) {
         if (!is_callable($callback)) {
-            Console::Warning('Failed to set event callback. Not callable.');
+            Console::warning('Failed to set event callback. Not callable.');
             return;
         }
         switch ($event) {
@@ -134,7 +139,7 @@ class Server {
                 $this->_worker->onBufferDrain = $callback;
                 break;
             default:
-                Console::Warning("Unsupported event \"$event\".");
+                Console::warning("Unsupported event \"$event\".");
         }
     }
     /**
@@ -154,8 +159,8 @@ class Server {
      * @param Worker $worker
      */
     function onServerStart(Worker $worker) {
-        View::init();
-        Server::$name = $this->_name;
+        self::$name = $this->_name;
+        self::$memcache = new \Memcached();
         if (is_callable($this->_on_stop))
             call_user_func($this->_on_stop, $worker);
     }
@@ -165,7 +170,6 @@ class Server {
      * @param Worker $worker
      */
     function onServerStop(Worker $worker) {
-        View::destroy();
         if (is_callable($this->_on_stop))
             call_user_func($this->_on_stop, $worker);
     }

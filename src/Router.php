@@ -68,7 +68,7 @@ class Router {
                 $this->_tree['/404'] = [];
             $this->_pSet = $this->_tree['/404'];
             if (isset($this->_pSet['/func']))
-                Console::Fatal("Conflict detected. Failed to register route.");
+                Console::fatal("Conflict detected. Failed to register route.");
             $this->_pSet['/func'] = $callback;
             $this->_pSet['/in'] = [];
             $this->_pSet['/out'] = [];
@@ -84,7 +84,7 @@ class Router {
                         $this->_pSet['/var'] = [];
                     $this->_pSet = &$this->_pSet['/var'];
                     if (isset($this->_pSet['/name']))
-                        Console::Fatal("Failed to register route. Conflict in Parameter name \"$value\".");
+                        Console::fatal("Failed to register route. Conflict in Parameter name \"$value\".");
                     $this->_pSet['/name'] = substr($value, 1);
                 } else {
                     if (!isset($this->_pSet[$value]))
@@ -93,7 +93,7 @@ class Router {
                 }
             }
             if (isset($this->_pSet['/func']))
-                Console::Fatal("Conflict detected. Failed to register route.");
+                Console::fatal("Conflict detected. Failed to register route.");
             $this->_pSet['/func'] = $callback;
             $this->_pSet['/in'] = [];
             $this->_pSet['/out'] = [];
@@ -110,7 +110,7 @@ class Router {
     function locate(array $path, string $method) {
         unset($this->_pCall, $this->urlParams, $this->retMsg, $this->filterMsg);
         if (!isset($this->_tree[$method])) {
-            $this->retMsg = Respond::Err(400, 'Invalid method.');
+            $this->retMsg = Respond::err(400, 'Invalid method.');
             return;
         }
         $this->_pCall = &$this->_tree[$method];
@@ -137,7 +137,7 @@ class Router {
             $this->_pCall = $this->_tree['/404'];
             $this->call();
         } else
-            $this->retMsg = Respond::Err(404, 'Not found.');
+            $this->retMsg = Respond::err(404, 'Not found.');
     }
     /**
      * 路由分发。
@@ -165,7 +165,7 @@ class Router {
      */
     protected function call() : bool {
         if (!isset($this->_pCall)) {
-            Console::Warning('Failed to call. Invalid pointer.');
+            Console::warning('Failed to call. Invalid pointer.');
             return false;
         }
         foreach ($this->_pCall['/in'] as $in_filter) {
@@ -186,23 +186,26 @@ class Router {
     /**
      * 路由别名，用于实现分发。
      *
-     * @param string $name
+     * @param mixed $names
      * @return Router
      */
-    function alias(string $name) : self {
+    function alias($names) : self {
         if (!isset($this->_pSet)) {
-            Console::Warning("No route to alias..");
+            Console::warning("No route to alias..");
             return $this;
         }
-        if (!is_array($name))
-        if (isset($this->_alias[$name]))
-            Console::Notice("Overwriting route alias \"$name\".");
-        $this->_alias[$name] = [
-            '/func' => $this->_pSet['/func'],
-            '/in' => $this->_pSet['/in'],
-            '/out' => $this->_pSet['/out'],
-            '/ctrl' => $this->_pSet['/ctrl']
-        ];
+        if (!is_array($names))
+            $names = [$names];
+        foreach ($names as $name) {
+            if (isset($this->_alias[$name]))
+                Console::notice("Overwriting route alias \"$name\".");
+            $this->_alias[$name] = [
+                '/func' => $this->_pSet['/func'],
+                '/in' => $this->_pSet['/in'],
+                '/out' => $this->_pSet['/out'],
+                '/ctrl' => $this->_pSet['/ctrl']
+            ];
+        }
         return $this;
     }
     /**
@@ -214,7 +217,7 @@ class Router {
      */
     function invoke(string $name, $param = null) {
         if (!isset($this->_pCall['/ctrl'][$name])) {
-            Console::Warning("Invalid controller binding.\"$name\"");
+            Console::warning("Invalid controller binding.\"$name\"");
             return false;
         }
         $class = $this->_pCall['/ctrl'][$name][0];
@@ -225,30 +228,37 @@ class Router {
         return $ret;
     }
     /**
-     * 绑定控制器及方法
+     * 绑定控制器及其方法。
      *
-     * @param string $name
-     * @param string $controller
-     * @param string $method
+     * @param array $controllers
      * @return Router
      */
-    function bind(string $name, string $controller, string $method) : self {
-        if (!isset($this->_pSet)) {
-            Console::Warning("No route to bind.");
-            return $this;
+    function bind(array $controllers) : self {
+        if (!is_array($controllers[0]))
+            $controllers = [$controllers];
+        foreach ($controllers as $controller) {
+            if (count($controller) != 3) {
+                Console::warning("Invalid controller binding,");
+                continue;
+            }
+            [$name, $controller, $method] = $controllers;
+            if (!isset($this->_pSet)) {
+                Console::warning("No route to bind.");
+                return $this;
+            }
+            $controller = Server::$name.'\\Controller\\'.$controller;
+            if (!class_exists($controller) || !is_subclass_of($controller, Controller::class)) {
+                Console::warning("Invalid controller \"$controller\".");
+                return $this;
+            }
+            if (!method_exists($controller, $method)) {
+                Console::warning("Invalid method \"$method\".");
+                return $this;
+            }
+            if (isset($this->_pSet['/ctrl'][$name]))
+                Console::warning("Overwriting controller binding \"$name\"");
+            $this->_pSet['/ctrl'][$name] = [$controller, $method];
         }
-        $controller = Server::$name.'\\Controller\\'.$controller;
-        if (!class_exists($controller) || !is_subclass_of($controller, Controller::class)) {
-            Console::Warning("Invalid controller \"$controller\".");
-            return $this;
-        }
-        if (!method_exists($controller, $method)) {
-            Console::Warning("Invalid method \"$method\".");
-            return $this;
-        }
-        if (isset($this->_pSet['/ctrl'][$name]))
-            Console::Warning("Overwriting controller binding \"$name\"");
-        $this->_pSet['/ctrl'][$name] = [$controller, $method];
         return $this;
     }
     /**
@@ -259,14 +269,14 @@ class Router {
      */
     function filter(array $filters) : self {
         if (!isset($this->_pSet)) {
-            Console::Warning("No route to filter.");
+            Console::warning("No route to filter.");
             return $this;
         }
         foreach ($filters as $filter => $type) {
             $callback = Filter::fetch($filter, $type);
             if ($callback) {
                 if (!is_callable($callback)) {
-                    Console::Warning('Failed to bind filter. Callback function not callable.');
+                    Console::warning('Failed to bind filter. Callback function not callable.');
                     continue;
                 }
                 if (!($callback instanceof \Closure))

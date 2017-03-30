@@ -1,5 +1,13 @@
 <?php
 /**
+ * 检查当前PHP版本
+ */
+$php_version = phpversion();
+if (version_compare($php_version, '7.1.0', '<')) {
+    echo "Your PHP(version $php_version) is not supported by Acast. Please install PHP 7.1.0 or above.\n";
+    exit(1);
+}
+/**
  * 引用Acast配置文件
  */
 require_once __DIR__ . '/Config.php';

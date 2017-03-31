@@ -1,7 +1,7 @@
 <?php
 
 namespace Acast;
-use Workerman\MySQL\Connection;
+use Workerman\Lib\Connection;
 /**
  * 模型
  * @package Acast
@@ -11,7 +11,7 @@ abstract class Model {
      * 数据库配置项
      * @var array
      */
-    protected static $_config = null;
+    protected static $_config = [];
     /**
      * 绑定的数据表
      * @var string

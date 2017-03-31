@@ -222,7 +222,7 @@ class Router {
         }
         $class = $this->_pCall['/ctrl'][$name][0];
         $method = $this->_pCall['/ctrl'][$name][1];
-        $object = new $class(Server::$name, $this);
+        $object = new $class($this);
         $ret = $object->$method($param);
         $this->retMsg = $object->retMsg;
         return $ret;

@@ -161,8 +161,8 @@ class Server {
     function onServerStart(Worker $worker) {
         self::$name = $this->_name;
         self::$memcache = new \Memcached();
-        if (is_callable($this->_on_stop))
-            call_user_func($this->_on_stop, $worker);
+        if (is_callable($this->_on_start))
+            call_user_func($this->_on_start, $worker);
     }
     /**
      * 服务停止回调

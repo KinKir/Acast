@@ -241,7 +241,7 @@ class Router {
                 Console::warning("Invalid controller binding,");
                 continue;
             }
-            [$name, $controller, $method] = $controllers;
+            [$name, $controller, $method] = $controller;
             if (!isset($this->_pSet)) {
                 Console::warning("No route to bind.");
                 return $this;

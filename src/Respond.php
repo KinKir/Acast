@@ -15,7 +15,7 @@ abstract class Respond {
      * @return string
      */
     static function err(int $code, string $msg) {
-        Http::header($code);
+        Http::header('HTTP', true, $code);
         return $msg;
     }
     /**

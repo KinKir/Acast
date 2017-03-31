@@ -245,9 +245,6 @@ class Http
      */
     public static function header($content, $replace = true, $http_response_code = 0)
     {
-        if (PHP_SAPI != 'cli') {
-            return $http_response_code ? header($content, $replace, $http_response_code) : header($content, $replace);
-        }
         if (strpos($content, 'HTTP') === 0) {
             $key = 'Http-Code';
         } else {
@@ -285,10 +282,6 @@ class Http
      */
     public static function headerRemove($name)
     {
-        if (PHP_SAPI != 'cli') {
-            header_remove($name);
-            return;
-        }
         unset(HttpCache::$header[$name]);
     }
 
@@ -313,9 +306,6 @@ class Http
         $secure = false,
         $HTTPOnly = false
     ) {
-        if (PHP_SAPI != 'cli') {
-            return setcookie($name, $value, $maxage, $path, $domain, $secure, $HTTPOnly);
-        }
         return self::header(
             'Set-Cookie: ' . $name . '=' . rawurlencode($value)
             . (empty($domain) ? '' : '; Domain=' . $domain)
@@ -332,9 +322,6 @@ class Http
      */
     public static function sessionStart()
     {
-        if (PHP_SAPI != 'cli') {
-            return session_start();
-        }
 
         self::tryGcSessions();
 
@@ -381,9 +368,7 @@ class Http
      */
     public static function sessionWriteClose()
     {
-        if (PHP_SAPI != 'cli') {
-            return session_write_close();
-        }
+
         if (!empty(HttpCache::$instance->sessionStarted) && !empty($_SESSION)) {
             $session_str = session_encode();
             if ($session_str && HttpCache::$instance->sessionFile) {
@@ -401,9 +386,6 @@ class Http
      */
     public static function end($msg = '')
     {
-        if (PHP_SAPI != 'cli') {
-            exit($msg);
-        }
         if ($msg) {
             echo $msg;
         }

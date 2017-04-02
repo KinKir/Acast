@@ -23,7 +23,7 @@ class Server {
      * 绑定的路由
      * @var Router|null
      */
-    protected $_route = null;
+    protected $_router = null;
     /**
      * 客户端连接实例
      * @var TcpConnection
@@ -67,7 +67,6 @@ class Server {
         $this->_worker->onWorkerStop = [$this, 'onServerStop'];
         $this->_worker->onMessage = [$this, 'onMessage'];
         $this->config(DEFAULT_WORKER_CONFIG);
-        $this->_route = new Router();
     }
     /**
      * 配置Workerman
@@ -107,12 +106,12 @@ class Server {
      * @param TcpConnection $connection
      */
     function onMessage(TcpConnection $connection) {
-        $this->_route->connection = $this->_connection = $connection;
+        $this->_router->connection = $this->_connection = $connection;
         $path = explode('/', substr($_SERVER['REQUEST_URI'], 1));
         if (empty($path[0]) && count($path) == 1)
             $path = [];
-        $this->_route->locate($path, $_SERVER['REQUEST_METHOD']);
-        $connection->close($this->_route->retMsg ?? '');
+        $this->_router->locate($path, $_SERVER['REQUEST_METHOD']);
+        $connection->close($this->_router->retMsg ?? '');
     }
     /**
      * 绑定事件回调
@@ -143,15 +142,14 @@ class Server {
         }
     }
     /**
-     * 注册路由
+     * 绑定路由实例
      *
-     * @param array $path
-     * @param $methods
-     * @param callable $callback
-     * @return Router
+     * @param string $name
      */
-    function route(array $path, $methods, callable $callback) : Router {
-        return $this->_route->add($path, $methods, $callback);
+    function route(string $name) {
+        if (isset($this->_router))
+            Console::warning("Overwriting router binding for app \"$this->_name\"");
+        $this->_router = Router::instance($name);
     }
     /**
      * 服务启动回调
@@ -163,6 +161,8 @@ class Server {
         self::$memcache = new \Memcached();
         if (is_callable($this->_on_start))
             call_user_func($this->_on_start, $worker);
+        if (!isset($this->_router))
+            Console::warning("No router bound to server \"$this->_name\".");
     }
     /**
      * 服务停止回调

@@ -4,6 +4,14 @@
 
 ### 注册路由
 
+> static function Router::create(string $name) void
+
+根据路由名称创建路由实例。创建的实例可以由以下方法获取：
+
+> static function Router::instance(string $name) Router
+
+### 添加路由
+
 > function Router::add(?array $path, $methods, callable $callback) Router
 
 1. $path为Request URI以"/"为分界符分割后的数组。如果是根目录，则为空数组。如果要将数组的某个成员作为参数捕获，则在其之前加"/"。路由匹配成功后，其值将保存到$this-\>urlParams中。例如，$path为\['id', '/id', 'name', '/name'\]，且Request URI为"/id/3/name/foo"时，就会得到$this-\>urlParams = \['id => '3', 'name' => 'foo'\]。

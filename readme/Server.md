@@ -27,19 +27,11 @@ Server::create('Demo', 8080);
 
 ### 添加路由
 
-> function Server::route(array $path, $methods, callable $callback) Router
+> function Server::route(string $name) void
 
-成员函数route可以用来为当前服务注册路由。它实质上是调用了与该服务提供者绑定的Route示例的add方法。
+成员函数route可以用来为当前服务绑定路由实例。
 
-具体参数含义及使用方法参见[路由](Router.md)这一章中“注册路由”一节。
-
-以下为示例：
-
-```php
-Server::app('Demo')->route(['hello'], 'GET', function () {
-    $this->retMsg = 'Hello world!';
-});
-```
+路由的使用方法参见[路由](Router.md)这一章。
 
 ### 注册事件
 

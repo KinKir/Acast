@@ -7,7 +7,13 @@ use Workerman\Connection\TcpConnection;
  * 路由
  * @package Acast
  */
-class Router {
+class Router
+{
+    /**
+     * 路由列表
+     * @var array
+     */
+    static $routers = [];
     /**
      * 设置别名的路由
      * @var array
@@ -48,6 +54,27 @@ class Router {
      * @var TcpConnection
      */
     public $connection = null;
+
+    /**
+     * 创建路由实例。
+     * @param string $name
+     */
+    static function create(string $name) {
+        if (isset(self::$routers[$name]))
+            Console::fatal("Router \"$name\" already exists.");
+        self::$routers[$name] = new self();
+    }
+    /**
+     * 获取路由实例。
+     *
+     * @param string $name
+     * @return Router
+     */
+    static function instance(string $name) : self {
+        if (!isset(self::$routers[$name]))
+            Console::fatal("Router \"$name\" do not exist.");
+        return self::$routers[$name];
+    }
     /**
      * 注册路由。
      *

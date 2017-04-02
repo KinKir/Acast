@@ -48,12 +48,12 @@ class Server {
      * Memcached实例
      * @var \Memcached
      */
-    public static $memcache = null;
+    static $memcache = null;
     /**
      * 服务名（进程空间）
      * @var string
      */
-    public static $name = null;
+    static $name = null;
     /**
      * 构造函数
      *

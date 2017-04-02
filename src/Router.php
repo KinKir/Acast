@@ -54,7 +54,10 @@ class Router
      * @var TcpConnection
      */
     public $connection = null;
-
+    /**
+     * 构造函数
+     */
+    protected function __construct() {}
     /**
      * 创建路由实例。
      * @param string $name
@@ -137,7 +140,7 @@ class Router
     function locate(array $path, string $method) {
         unset($this->_pCall, $this->urlParams, $this->retMsg, $this->filterMsg);
         if (!isset($this->_tree[$method])) {
-            $this->retMsg = Respond::err(400, 'Invalid method.');
+            $this->retMsg = View::err(400, 'Invalid method.');
             return;
         }
         $this->_pCall = &$this->_tree[$method];
@@ -161,10 +164,10 @@ class Router
         goto Loop;
         Err:
         if (isset($this->_tree['/404']['/func'])) {
-            $this->_pCall = $this->_tree['/404'];
+            $this->_pCall = &$this->_tree['/404'];
             $this->call();
         } else
-            $this->retMsg = Respond::err(404, 'Not found.');
+            $this->retMsg = View::err(404, 'Not found.');
     }
     /**
      * 路由分发。

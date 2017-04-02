@@ -1,6 +1,8 @@
 <?php
 
 namespace Acast;
+use Workerman\Protocols\Http;
+
 /**
  * 视图
  * @package Acast
@@ -66,33 +68,33 @@ abstract class View {
         return $this;
     }
     /**
-     * 生成HTTP错误信息
+     * 格式化HTTP错误信息
      *
      * @param int $code
      * @param string $msg
-     * @return self
+     * @return string
      */
-    function err(int $code, string $msg) : self {
-        $this->_temp = Respond::err($code, $msg);
-        return $this;
+    static function err(int $code, string $msg) {
+        Http::header('HTTP', true, $code);
+        return $msg;
     }
     /**
-     * 生成JSON
+     * 格式化为JSON
      *
      * @param array $data
      * @param int $err
-     * @return self
+     * @return string
      */
-    function json(array $data, int $err = 0) : self {
-        $this->_temp = Respond::json($data, $err);
-        return $this;
+    static function json(array $data, int $err = 0) {
+        Http::header('Content-Type: application/json');
+        return json_encode(['err' => $err] + $data);
     }
     /**
      * 将视图回传给控制器
      */
     function show() {
         if (!isset($this->_temp))
-            $this->_controller->retMsg = Respond::err(500, 'Server failed to give any response.');
+            $this->_controller->retMsg = View::err(500, 'Server failed to give any response.');
         else
             $this->_controller->retMsg = $this->_temp;
     }

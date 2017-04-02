@@ -22,6 +22,12 @@ php main.php clear user room
 
 如果函数名没有匹配，则参数会交给Workerman处理。如start，stop等。因此，不要注册和Workerman冲突的参数。
 
-### 响应
+### Memcached使用
 
-在控制器外，你不能使用与之绑定的视图快速地格式化返回数据。Acast\\Respond提供了基本的错误返回和JSON格式化。
+服务启动时，Acast会自动创建Memcached客户端实例Server::$memcache，需要在服务器上预先配置Memcached服务：
+
+```bash
+sudo service memcached start
+```
+
+并在Workerman的start事件中连接Memcached server，方可使用。

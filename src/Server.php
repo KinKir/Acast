@@ -112,7 +112,7 @@ class Server {
         if (empty($path[0]) && count($path) == 1)
             $path = [];
         $this->_route->locate($path, $_SERVER['REQUEST_METHOD']);
-        $connection->close($this->_route->retMsg);
+        $connection->close($this->_route->retMsg ?? '');
     }
     /**
      * 绑定事件回调

@@ -38,12 +38,12 @@ abstract class Controller {
      */
     function __construct(Router $route) {
         $temp = explode('\\', get_called_class());
-        $name = Server::$name.'\\Model\\'.end($temp);
-        if (class_exists($name))
-            $this->model = new $name();
         $name = Server::$name.'\\View\\'.end($temp);
         if (class_exists($name))
             $this->view = new $name($this);
+        $name = Server::$name.'\\Model\\'.end($temp);
+        if (class_exists($name))
+            $this->model = new $name($this->view);
         $this->urlParams = $route->urlParams ?? [];
         $this->retMsg = $route->retMsg ?? null;
         $this->filterMsg = $route->filterMsg ?? null;

@@ -23,6 +23,19 @@ abstract class Model {
      */
     protected static $_connection = null;
     /**
+     * 控制器绑定的视图实例
+     * @var View|null
+     */
+    protected $_view = null;
+    /**
+     * 构造函数
+     * @param View|null $view
+     */
+    function __construct(?View $view = null) {
+        if ($view)
+            $this->_view = $view;
+    }
+    /**
      * 配置数据库连接
      *
      * @param array $config

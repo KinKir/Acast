@@ -71,7 +71,7 @@ $name支持数组。这种情况下，数组中每个路由的回调函数将被
 ### 示例
 
 ```php
-Server::app('Demo')->route([], ['GET', 'POST'], function () {
+Router::instance('Demo')->add([], ['GET', 'POST'], function () {
     if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $this->dispatch('user');
     } else {
@@ -79,9 +79,9 @@ Server::app('Demo')->route([], ['GET', 'POST'], function () {
     }
     return false;
 });
-Server::app('Demo')->route(['user'], 'POST', function () {
+Router::instance('Demo')->add(['user'], 'POST', function () {
     if ($this->filterMsg) {
         $this->invoke();
     }
-})->filter(['auth' => \Acast\IN_FILTER])->bind(['showUserName', 'User', 'showName'])->alias('user');
+})->filter(['auth' => Filter::_IN_])->bind(['showUserName', 'User', 'showName'])->alias('user');
 ```

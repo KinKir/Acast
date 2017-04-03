@@ -54,6 +54,11 @@ class Router
      */
     public $connection = null;
     /**
+     * HTTP请求方法
+     * @var string
+     */
+    public $method = null;
+    /**
      * 构造函数
      */
     protected function __construct() {}
@@ -138,8 +143,9 @@ class Router
      */
     function locate(array $path, string $method) {
         unset($this->_pCall, $this->urlParams, $this->retMsg, $this->filterMsg);
+        $this->method = $method;
         if (!isset($this->_tree[$method])) {
-            $this->retMsg = View::err(400, 'Invalid method.');
+            $this->retMsg = View::http(400, 'Invalid method.');
             return;
         }
         $this->_pCall = &$this->_tree[$method];
@@ -166,7 +172,7 @@ class Router
             $this->_pCall = &$this->_tree['/404'];
             $this->call();
         } else
-            $this->retMsg = View::err(404, 'Not found.');
+            $this->retMsg = View::http(404, 'Not found.');
     }
     /**
      * 路由分发
@@ -198,16 +204,16 @@ class Router
             return false;
         }
         foreach ($this->_pCall['/in'] as $in_filter) {
-            if (!($in_filter() ?? true))
+            if (!($in_filter($this->method) ?? true))
                 break;
         }
         $status = $this->connection->getStatus();
         if ($status === TcpConnection::STATUS_CLOSING || $status === TcpConnection::STATUS_CLOSED)
             return false;
         $callback = $this->_pCall['/func'];
-        $ret = $callback() ?? true;
+        $ret = $callback($this->method) ?? true;
         foreach ($this->_pCall['/out'] as $out_filter) {
-            if (!($out_filter() ?? true))
+            if (!($out_filter($this->method) ?? true))
                 break;
         }
         return $ret;
@@ -240,11 +246,11 @@ class Router
     /**
      * 调用已注册的控制器中的方法
      *
-     * @param string $name
+     * @param string|int $name
      * @param mixed $param
      * @return mixed
      */
-    function invoke(string $name, $param = null) {
+    function invoke($name = 0, $param = null) {
         if (!isset($this->_pCall['/ctrl'][$name])) {
             Console::warning("Invalid controller binding \"$name\".");
             return false;
@@ -263,17 +269,22 @@ class Router
      * @return Router
      */
     function bind(array $controllers) : self {
+        if (!isset($this->_pSet)) {
+            Console::warning("No route to bind.");
+            return $this;
+        }
         if (!is_array($controllers[0]))
             $controllers = [$controllers];
         foreach ($controllers as $controller) {
-            if (count($controller) != 3) {
+            $count = count($controller);
+            if ($count == 3)
+                [$name, $controller, $method] = $controller;
+            elseif ($count == 4) {
+                [$controller, $method] = $controller;
+                $name = count($this->_pSet['/ctrl']);
+            } else {
                 Console::warning("Invalid controller binding,");
                 continue;
-            }
-            [$name, $controller, $method] = $controller;
-            if (!isset($this->_pSet)) {
-                Console::warning("No route to bind.");
-                return $this;
             }
             $controller = Server::$name.'\\Controller\\'.$controller;
             if (!class_exists($controller) || !is_subclass_of($controller, Controller::class)) {

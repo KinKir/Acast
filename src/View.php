@@ -67,13 +67,13 @@ abstract class View {
         return $this;
     }
     /**
-     * 格式化HTTP错误信息
+     * 置HTTP状态码
      *
      * @param int $code
-     * @param string $msg
-     * @return string
+     * @param string|null $msg
+     * @return string|null
      */
-    static function err(int $code, string $msg) {
+    static function http(int $code, ?string $msg = null) {
         Http::header('HTTP', true, $code);
         return $msg;
     }
@@ -93,7 +93,7 @@ abstract class View {
      */
     function show() {
         if (!isset($this->_temp))
-            $this->_controller->retMsg = View::err(500, 'Server failed to give any response.');
+            $this->_controller->retMsg = View::http(500, 'Server failed to give any response.');
         else
             $this->_controller->retMsg = $this->_temp;
     }

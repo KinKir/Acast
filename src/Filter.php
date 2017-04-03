@@ -15,17 +15,17 @@ abstract class Filter {
      */
     const _OUT_ = 1;
     /**
-     * 前驱中间件，将在路由回调之前被调用。
+     * 前驱中间件，将在路由回调之前被调用
      * @var array
      */
     protected static $_inFilters = [];
     /**
-     * 后继中间件，将在路由回调之后被调用。
+     * 后继中间件，将在路由回调之后被调用
      * @var array
      */
     protected static $_outFilters = [];
     /**
-     * 注册中间件。
+     * 注册中间件
      *
      * @param string $name
      * @param int $type
@@ -40,7 +40,7 @@ abstract class Filter {
             self::$_outFilters[$name] = $callback;
     }
     /**
-     * 获取中间件。
+     * 获取中间件
      *
      * @param string $name
      * @param int $type

@@ -49,14 +49,16 @@ abstract class Model {
      * MySQL SELECT
      *
      * @param $cols
-     * @param array $where
+     * @param array|null $where
      * @param array|null $bind
      * @param array|null $order_by
      * @param array|null $limit
      * @return mixed
      */
-    function select($cols, array $where, ?array $bind = null, ?array $order_by = null, ?array $limit = null) {
-        $query = self::Db()->select($cols)->from($this->_table)->where($where);
+    function select($cols, ?array $where = null, ?array $bind = null, ?array $order_by = null, ?array $limit = null) {
+        $query = self::Db()->select($cols)->from($this->_table);
+        if (isset($where))
+            $query->where($where);
         if (isset($order_by))
             $query->orderByASC($order_by[1], $order_by[0]);
         if (isset($bind))
@@ -82,13 +84,15 @@ abstract class Model {
      * MySQL UPDATE
      *
      * @param $cols
-     * @param array $where
+     * @param array|null $where
      * @param array|null $bind
      * @param int|null $limit
      * @return mixed
      */
-    function update($cols, array $where, ?array $bind = null, ?int $limit = null) {
-        $query = self::Db()->update($this->_table)->cols($cols)->where($where);
+    function update($cols, ?array $where = null, ?array $bind = null, ?int $limit = null) {
+        $query = self::Db()->update($this->_table)->cols($cols);
+        if (isset($where))
+            $query->where($where);
         if (isset($bind))
             $query->bindValues($bind);
         if (isset($limit))

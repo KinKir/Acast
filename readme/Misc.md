@@ -31,3 +31,9 @@ sudo service memcached start
 ```
 
 并在Workerman的start事件中连接Memcached server，方可使用。
+
+### Workerman
+
+注意，Workerman无法在Acast中直接使用。请在Workerman\\Connection中加入getStatus\(\)方法。
+
+请将Workerman\\Connection至于Workerman\\Lib目录下，并将命名空间改为Workerman\\Lib，以便Autoloader自动载入。

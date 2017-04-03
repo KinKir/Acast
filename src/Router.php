@@ -2,7 +2,6 @@
 
 namespace Acast;
 use Workerman\Connection\TcpConnection;
-
 /**
  * 路由
  * @package Acast
@@ -59,7 +58,7 @@ class Router
      */
     protected function __construct() {}
     /**
-     * 创建路由实例。
+     * 创建路由实例
      * @param string $name
      */
     static function create(string $name) {
@@ -68,7 +67,7 @@ class Router
         self::$routers[$name] = new self();
     }
     /**
-     * 获取路由实例。
+     * 获取路由实例
      *
      * @param string $name
      * @return Router
@@ -79,7 +78,7 @@ class Router
         return self::$routers[$name];
     }
     /**
-     * 注册路由。
+     * 注册路由
      *
      * @param array|null $path
      * @param $methods
@@ -132,7 +131,7 @@ class Router
         return $this;
     }
     /**
-     * 定位路由。该方法在收到HTTP请求后被调用。
+     * 定位路由。该方法在收到HTTP请求后被调用
      *
      * @param array $path
      * @param string $method
@@ -170,7 +169,7 @@ class Router
             $this->retMsg = View::err(404, 'Not found.');
     }
     /**
-     * 路由分发。
+     * 路由分发
      *
      * @param $name
      * @return bool
@@ -189,7 +188,7 @@ class Router
         }
     }
     /**
-     * 路由事件处理，包括中间件和路由回调。
+     * 路由事件处理，包括中间件和路由回调
      *
      * @return bool
      */
@@ -214,14 +213,14 @@ class Router
         return $ret;
     }
     /**
-     * 路由别名，用于实现分发。
+     * 路由别名，用于实现分发
      *
      * @param mixed $names
      * @return Router
      */
     function alias($names) : self {
         if (!isset($this->_pSet)) {
-            Console::warning("No route to alias..");
+            Console::warning("No route to alias.");
             return $this;
         }
         if (!is_array($names))
@@ -239,7 +238,7 @@ class Router
         return $this;
     }
     /**
-     * 调用已注册的控制器中的方法。
+     * 调用已注册的控制器中的方法
      *
      * @param string $name
      * @param mixed $param
@@ -247,7 +246,7 @@ class Router
      */
     function invoke(string $name, $param = null) {
         if (!isset($this->_pCall['/ctrl'][$name])) {
-            Console::warning("Invalid controller binding.\"$name\"");
+            Console::warning("Invalid controller binding \"$name\".");
             return false;
         }
         $class = $this->_pCall['/ctrl'][$name][0];
@@ -258,7 +257,7 @@ class Router
         return $ret;
     }
     /**
-     * 绑定控制器及其方法。
+     * 绑定控制器及其方法
      *
      * @param array $controllers
      * @return Router

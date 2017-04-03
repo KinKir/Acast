@@ -2,7 +2,6 @@
 
 namespace Acast;
 use Workerman\Protocols\Http;
-
 /**
  * 视图
  * @package Acast

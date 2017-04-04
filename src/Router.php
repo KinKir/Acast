@@ -127,7 +127,7 @@ class Router
                     if (!isset($this->_pSet[self::_PARAMETER]))
                         $this->_pSet[self::_PARAMETER] = [];
                     $this->_pSet = &$this->_pSet[self::_PARAMETER];
-                    if (isset($this->_pSet[self::_NAME]))
+                    if (isset($this->_pSet[self::_NAME]) && $this->_pSet[self::_NAME] != substr($value, 1))
                         Console::fatal("Failed to register route. Conflict in Parameter name \"$value\".");
                     $this->_pSet[self::_NAME] = substr($value, 1);
                 } else {
@@ -289,7 +289,7 @@ class Router
             $count = count($controller);
             if ($count == 3)
                 [$name, $controller, $method] = $controller;
-            elseif ($count == 4) {
+            elseif ($count == 2) {
                 [$controller, $method] = $controller;
                 $name = count($this->_pSet[self::_CONTROLLER]);
             } else {

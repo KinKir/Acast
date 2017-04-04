@@ -9,6 +9,16 @@ use Workerman\Connection\TcpConnection;
 class Router
 {
     /**
+     * 路由常量
+     */
+    protected const _CALLBACK = '/0';
+    protected const _IN_FILTER = '/1';
+    protected const _OUT_FILTER = '/2';
+    protected const _CONTROLLER= '/3';
+    protected const _NAME = '/4';
+    protected const _PARAMETER = '/5';
+    protected const _404 = '/404';
+    /**
      * 路由列表
      * @var array
      */
@@ -98,15 +108,15 @@ class Router
         if (!is_array($methods))
             $methods = [$methods];
         if (is_null($path)) {
-            if (!isset($this->_tree['/404']))
-                $this->_tree['/404'] = [];
-            $this->_pSet = $this->_tree['/404'];
-            if (isset($this->_pSet['/func']))
+            if (!isset($this->_tree[self::_404]))
+                $this->_tree[self::_404] = [];
+            $this->_pSet = $this->_tree[self::_404];
+            if (isset($this->_pSet[self::_CALLBACK]))
                 Console::fatal("Conflict detected. Failed to register route.");
-            $this->_pSet['/func'] = $callback;
-            $this->_pSet['/in'] = [];
-            $this->_pSet['/out'] = [];
-            $this->_pSet['/ctrl'] = null;
+            $this->_pSet[self::_CALLBACK] = $callback;
+            $this->_pSet[self::_IN_FILTER] = [];
+            $this->_pSet[self::_OUT_FILTER] = [];
+            $this->_pSet[self::_CONTROLLER] = [];
         }
         foreach ($methods as $method) {
             if (!isset($this->_tree[$method]))
@@ -114,24 +124,24 @@ class Router
             $this->_pSet = &$this->_tree[$method];
             foreach ($path as $value) {
                 if (strpos($value, '/') === 0) {
-                    if (!isset($this->_pSet->{'/var'}))
-                        $this->_pSet['/var'] = [];
-                    $this->_pSet = &$this->_pSet['/var'];
-                    if (isset($this->_pSet['/name']))
+                    if (!isset($this->_pSet[self::_PARAMETER]))
+                        $this->_pSet[self::_PARAMETER] = [];
+                    $this->_pSet = &$this->_pSet[self::_PARAMETER];
+                    if (isset($this->_pSet[self::_NAME]))
                         Console::fatal("Failed to register route. Conflict in Parameter name \"$value\".");
-                    $this->_pSet['/name'] = substr($value, 1);
+                    $this->_pSet[self::_NAME] = substr($value, 1);
                 } else {
                     if (!isset($this->_pSet[$value]))
                         $this->_pSet[$value] = [];
                     $this->_pSet = &$this->_pSet[$value];
                 }
             }
-            if (isset($this->_pSet['/func']))
+            if (isset($this->_pSet[self::_CALLBACK]))
                 Console::fatal("Conflict detected. Failed to register route.");
-            $this->_pSet['/func'] = $callback;
-            $this->_pSet['/in'] = [];
-            $this->_pSet['/out'] = [];
-            $this->_pSet['/ctrl'] = null;
+            $this->_pSet[self::_CALLBACK] = $callback;
+            $this->_pSet[self::_IN_FILTER] = [];
+            $this->_pSet[self::_OUT_FILTER] = [];
+            $this->_pSet[self::_CONTROLLER] = [];
         }
         return $this;
     }
@@ -152,24 +162,24 @@ class Router
         foreach ($path as $value) {
             if (isset($this->_pCall[$value]))
                 $this->_pCall = &$this->_pCall[$value];
-            elseif (isset($this->_pCall['/var'])) {
-                $this->_pCall = &$this->_pCall['/var'];
-                $this->urlParams[$this->_pCall['/name']] = $value;
+            elseif (isset($this->_pCall[self::_PARAMETER])) {
+                $this->_pCall = &$this->_pCall[self::_PARAMETER];
+                $this->urlParams[$this->_pCall[self::_NAME]] = $value;
             } else goto Err;
         }
         Loop:
-        if (isset($this->_pCall['/func'])) {
+        if (isset($this->_pCall[self::_CALLBACK])) {
             $this->call();
             return;
         }
-        if (isset($this->_pCall['/var'])) {
-            $this->_pCall = &$this->_pCall['/var'];
-            $this->urlParams[$this->_pCall['/name']] = '';
+        if (isset($this->_pCall[self::_PARAMETER])) {
+            $this->_pCall = &$this->_pCall[self::_PARAMETER];
+            $this->urlParams[$this->_pCall[self::_NAME]] = '';
         } else goto Err;
         goto Loop;
         Err:
-        if (isset($this->_tree['/404']['/func'])) {
-            $this->_pCall = &$this->_tree['/404'];
+        if (isset($this->_tree[self::_404][self::_CALLBACK])) {
+            $this->_pCall = &$this->_tree[self::_404];
             $this->call();
         } else
             $this->retMsg = View::http(404, 'Not found.');
@@ -203,16 +213,16 @@ class Router
             Console::warning('Failed to call. Invalid pointer.');
             return false;
         }
-        foreach ($this->_pCall['/in'] as $in_filter) {
+        foreach ($this->_pCall[self::_IN_FILTER] as $in_filter) {
             if (!($in_filter($this->method) ?? true))
                 break;
         }
         $status = $this->connection->getStatus();
         if ($status === TcpConnection::STATUS_CLOSING || $status === TcpConnection::STATUS_CLOSED)
             return false;
-        $callback = $this->_pCall['/func'];
+        $callback = $this->_pCall[self::_CALLBACK];
         $ret = $callback($this->method) ?? true;
-        foreach ($this->_pCall['/out'] as $out_filter) {
+        foreach ($this->_pCall[self::_OUT_FILTER] as $out_filter) {
             if (!($out_filter($this->method) ?? true))
                 break;
         }
@@ -235,10 +245,11 @@ class Router
             if (isset($this->_alias[$name]))
                 Console::notice("Overwriting route alias \"$name\".");
             $this->_alias[$name] = [
-                '/func' => $this->_pSet['/func'],
-                '/in' => $this->_pSet['/in'],
-                '/out' => $this->_pSet['/out'],
-                '/ctrl' => $this->_pSet['/ctrl']
+                self::_CALLBACK => &$this->_pSet[self::_CALLBACK],
+                self::_IN_FILTER => &$this->_pSet[self::_IN_FILTER],
+                self::_OUT_FILTER => &$this->_pSet[self::_OUT_FILTER],
+                self::_CONTROLLER => &$this->_pSet[self::_CONTROLLER],
+                self::_NAME => &$this->_pSet
             ];
         }
         return $this;
@@ -251,12 +262,12 @@ class Router
      * @return mixed
      */
     function invoke($name = 0, $param = null) {
-        if (!isset($this->_pCall['/ctrl'][$name])) {
+        if (!isset($this->_pCall[self::_CONTROLLER][$name])) {
             Console::warning("Invalid controller binding \"$name\".");
             return false;
         }
-        $class = $this->_pCall['/ctrl'][$name][0];
-        $method = $this->_pCall['/ctrl'][$name][1];
+        $class = $this->_pCall[self::_CONTROLLER][$name][0];
+        $method = $this->_pCall[self::_CONTROLLER][$name][1];
         $object = new $class($this);
         $ret = $object->$method($param);
         $this->retMsg = $object->retMsg;
@@ -281,7 +292,7 @@ class Router
                 [$name, $controller, $method] = $controller;
             elseif ($count == 4) {
                 [$controller, $method] = $controller;
-                $name = count($this->_pSet['/ctrl']);
+                $name = count($this->_pSet[self::_CONTROLLER]);
             } else {
                 Console::warning("Invalid controller binding,");
                 continue;
@@ -295,9 +306,9 @@ class Router
                 Console::warning("Invalid method \"$method\".");
                 return $this;
             }
-            if (isset($this->_pSet['/ctrl'][$name]))
+            if (isset($this->_pSet[self::_CONTROLLER][$name]))
                 Console::warning("Overwriting controller binding \"$name\"");
-            $this->_pSet['/ctrl'][$name] = [$controller, $method];
+            $this->_pSet[self::_CONTROLLER][$name] = [$controller, $method];
         }
         return $this;
     }
@@ -322,7 +333,7 @@ class Router
                 if (!($callback instanceof \Closure))
                     $callback = \Closure::fromCallable($callback);
                 $callback = \Closure::bind($callback, $this, __CLASS__);
-                $this->_pSet[$type == Filter::_IN_ ? '/in' : '/out'][] = $callback;
+                $this->_pSet[$type == Filter::IN ? self::_IN_FILTER : self::_OUT_FILTER][] = $callback;
             }
         }
         return $this;

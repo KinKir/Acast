@@ -249,7 +249,6 @@ class Router
                 self::_IN_FILTER => &$this->_pSet[self::_IN_FILTER],
                 self::_OUT_FILTER => &$this->_pSet[self::_OUT_FILTER],
                 self::_CONTROLLER => &$this->_pSet[self::_CONTROLLER],
-                self::_NAME => &$this->_pSet
             ];
         }
         return $this;

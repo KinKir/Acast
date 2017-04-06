@@ -8,6 +8,14 @@
 
 如果存在类型及命名空间正确且与之名称相同的控制器或视图类，则它们会自动被加载。
 
+### 绑定外部模型
+
+> protected function Controller::invoke(string $name) Model|null
+
+有时，我们可能需要调用非与本控制器绑定的模型中的方法。invoke方法会返回指定模型的一个实例。
+
+$name为类名（不包括命名空间）。
+
 ### 成员变量
 
 1. $this-\>urlParams: 拷贝自路由实例。

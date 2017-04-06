@@ -48,4 +48,18 @@ abstract class Controller {
         $this->retMsg = $route->retMsg ?? null;
         $this->filterMsg = $route->filterMsg ?? null;
     }
+    /**
+     * 调用外部模型
+     *
+     * @param string $name
+     * @return Model|null
+     */
+    protected function invoke(string $name) : ?Model {
+        $class = Server::$name.'\\Model\\'.$name;
+        if (!class_exists($class) || !is_subclass_of($class, Model::class)) {
+            Console::warning("Invalid Model \"$name\"");
+            return null;
+        }
+        return new $class($this->view);
+    }
 }

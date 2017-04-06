@@ -158,22 +158,14 @@ class Http
         }
 
         // Parse $_POST.
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST' ||
+            $_SERVER['REQUEST_METHOD'] === 'PUT' ||
+            $_SERVER['REQUEST_METHOD'] === 'DELETE') {
             if (isset($_SERVER['CONTENT_TYPE']) && $_SERVER['CONTENT_TYPE'] === 'multipart/form-data') {
                 self::parseUploadFiles($http_body, $http_post_boundary);
             } else {
                 parse_str($http_body, $_POST);
-                // $GLOBALS['HTTP_RAW_POST_DATA']
-                $GLOBALS['HTTP_RAW_REQUEST_DATA'] = $GLOBALS['HTTP_RAW_POST_DATA'] = $http_body;
             }
-        }
-
-        if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
-                $GLOBALS['HTTP_RAW_REQUEST_DATA'] = $http_body;
-        }
-
-        if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
-                $GLOBALS['HTTP_RAW_REQUEST_DATA'] = $http_body;
         }
 
         // QUERY_STRING
@@ -192,7 +184,7 @@ class Http
         $_SERVER['REMOTE_ADDR'] = $connection->getRemoteIp();
         $_SERVER['REMOTE_PORT'] = $connection->getRemotePort();
 
-        return array('get' => $_GET, 'post' => $_POST, 'cookie' => $_COOKIE, 'server' => $_SERVER, 'files' => $_FILES);
+        return array();
     }
 
     /**

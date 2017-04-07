@@ -37,12 +37,12 @@ class Router
      * 设置指针
      * @var null
      */
-    protected $_pSet = null;
+    protected $_pSet;
     /**
      * 调用指针
      * @var null
      */
-    protected $_pCall = null;
+    protected $_pCall;
     /**
      * GET参数
      * @var array
@@ -52,22 +52,22 @@ class Router
      * 中间件返回数据
      * @var mixed
      */
-    public $filterMsg = null;
+    public $filterMsg;
     /**
      * 返回参数
      * @var mixed
      */
-    public $retMsg = null;
+    public $retMsg;
     /**
      * 连接实例
      * @var TcpConnection
      */
-    public $connection = null;
+    public $connection;
     /**
      * HTTP请求方法
      * @var string
      */
-    public $method = null;
+    public $method;
     /**
      * 构造函数
      */
@@ -221,7 +221,12 @@ class Router
         if ($status === TcpConnection::STATUS_CLOSING || $status === TcpConnection::STATUS_CLOSED)
             return false;
         $callback = $this->_pCall[self::_CALLBACK];
-        $ret = $callback($this->method) ?? true;
+        try {
+            $ret = $callback($this->method) ?? true;
+        } catch (\PDOException $exception) {
+            $this->retMsg = View::http(500, $exception->getMessage());
+            $ret = false;
+        }
         foreach ($this->_pCall[self::_OUT_FILTER] as $out_filter) {
             if (!($out_filter($this->method) ?? true))
                 break;

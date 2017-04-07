@@ -18,42 +18,42 @@ class Server {
      * Workerman Worker实例
      * @var Worker
      */
-    protected $_worker = null;
+    protected $_worker;
     /**
      * 绑定的路由
      * @var Router|null
      */
-    protected $_router = null;
+    protected $_router;
     /**
      * 客户端连接实例
      * @var TcpConnection
      */
-    protected $_connection = null;
+    protected $_connection;
     /**
      * 服务启动的回调
      * @var callable
      */
-    protected $_on_start = null;
+    protected $_on_start;
     /**
      * 服务停止的回调
      * @var callable
      */
-    protected $_on_stop = null;
+    protected $_on_stop;
     /**
      * 服务名
      * @var string
      */
-    protected $_name = null;
+    protected $_name;
     /**
      * Memcached实例
      * @var \Memcached
      */
-    static $memcache = null;
+    static $memcache;
     /**
      * 服务名（进程空间）
      * @var string
      */
-    static $name = null;
+    static $name;
     /**
      * 构造函数
      *

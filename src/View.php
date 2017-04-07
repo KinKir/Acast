@@ -16,12 +16,12 @@ abstract class View {
      * 绑定的计数器
      * @var Controller
      */
-    protected $_controller = null;
+    protected $_controller;
     /**
      * 临时返回数据
      * @var mixed
      */
-    protected $_temp = null;
+    protected $_temp;
     /**
      * 构造函数
      *

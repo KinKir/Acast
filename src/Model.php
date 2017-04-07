@@ -11,22 +11,22 @@ abstract class Model {
      * 数据库配置项
      * @var array
      */
-    protected static $_config = null;
+    protected static $_config;
     /**
      * 绑定的数据表
      * @var string
      */
-    protected $_table = null;
+    protected $_table;
     /**
      * 数据库连接实例
      * @var Connection
      */
-    protected static $_connection = null;
+    protected static $_connection;
     /**
      * 控制器绑定的视图实例
      * @var View|null
      */
-    protected $_view = null;
+    protected $_view;
     /**
      * 构造函数
      * @param View|null $view
@@ -114,8 +114,8 @@ abstract class Model {
      */
     static function Db() : Connection {
         if (!isset(self::$_connection)) {
-            [$host, $port, $user, $password, $db_name] = self::$_config;
-            self::$_connection = new Connection($host, $port, $user, $password, $db_name);
+            [$host, $port, $user, $password, $db_name, $charset] = self::$_config;
+            self::$_connection = new Connection($host, $port, $user, $password, $db_name, $charset);
         }
         return self::$_connection;
     }

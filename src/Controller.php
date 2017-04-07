@@ -10,12 +10,12 @@ abstract class Controller {
      * 中间件返回信息
      * @var mixed
      */
-    public $filterMsg = null;
+    public $filterMsg;
     /**
      * 返回数据
      * @var mixed
      */
-    public $retMsg = null;
+    public $retMsg;
     /**
      * GET参数
      * @var array
@@ -25,12 +25,17 @@ abstract class Controller {
      * 绑定的模型
      * @var Model
      */
-    protected $model = null;
+    protected $model;
     /**
      * 绑定的视图
      * @var View
      */
-    protected $view = null;
+    protected $view;
+    /**
+     * HTTP请求方法
+     * @var string
+     */
+    protected $method;
     /**
      * 构造函数，绑定模型、视图
      *
@@ -44,6 +49,7 @@ abstract class Controller {
         $name = Server::$name.'\\Model\\'.end($temp);
         if (class_exists($name))
             $this->model = new $name($this->view);
+        $this->method = $route->method;
         $this->urlParams = $route->urlParams ?? [];
         $this->retMsg = $route->retMsg ?? null;
         $this->filterMsg = $route->filterMsg ?? null;

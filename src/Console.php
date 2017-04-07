@@ -10,7 +10,7 @@ abstract class Console {
      * 标准输入流句柄
      * @var resource
      */
-    protected static $_stdin = null;
+    protected static $_stdin;
     /**
      * 控制台函数列表
      * @var array

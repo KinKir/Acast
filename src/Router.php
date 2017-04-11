@@ -248,6 +248,11 @@ class Router
         }
         yield;
     }
+    /**
+     * 调用路由回调
+     *
+     * @return bool
+     */
     private function _routerCall() : bool {
         $status = $this->connection->getStatus();
         if ($status === TcpConnection::STATUS_CLOSING || $status === TcpConnection::STATUS_CLOSED)
@@ -260,6 +265,9 @@ class Router
             return false;
         }
     }
+    /**
+     * 中间件延时
+     */
     protected function delay() {
         $this->_pCall[self::_DELAY] = true;
     }

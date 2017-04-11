@@ -66,7 +66,7 @@ php /Applications/main.php start -d
 
 中间件常常用于验证、过滤数据等。合理地使用中间件可以减少项目中的重复代码，使之更易维护。
 
-有关中间件的详细文档，见[这里](readme/Filter.md)。
+有关中间件的详细文档，见[这里](readme/Middleware.md)。
 
 #### 控制器
 

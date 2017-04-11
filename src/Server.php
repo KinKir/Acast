@@ -45,6 +45,11 @@ class Server {
      */
     protected $_name;
     /**
+     * 是否监听端口
+     * @var bool
+     */
+    protected $_listen;
+    /**
      * Memcached实例
      * @var \Memcached
      */
@@ -58,11 +63,12 @@ class Server {
      * 构造函数
      *
      * @param string $name
-     * @param int $listen
+     * @param int|null $listen
      */
-    protected function __construct(string $name, int $listen) {
+    protected function __construct(string $name, ?int $listen) {
         $this->_name = $name;
-        $this->_worker = new Worker('http://[::]:'.$listen);
+        $this->_listen = isset($listen);
+        $this->_worker = new Worker($this->_listen ? 'http://[::]:'.$listen : '');
         $this->_worker->onWorkerStart = [$this, 'onServerStart'];
         $this->_worker->onWorkerStop = [$this, 'onServerStop'];
         $this->_worker->onMessage = [$this, 'onMessage'];
@@ -161,7 +167,7 @@ class Server {
         self::$memcache = new \Memcached();
         if (is_callable($this->_on_start))
             call_user_func($this->_on_start, $worker);
-        if (!isset($this->_router))
+        if (!isset($this->_router) && $this->_listen)
             Console::warning("No router bound to server \"$this->_name\".");
     }
     /**

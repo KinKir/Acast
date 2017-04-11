@@ -12,11 +12,11 @@ class Router
      * 路由常量
      */
     protected const _CALLBACK = '/0';
-    protected const _IN_FILTER = '/1';
-    protected const _OUT_FILTER = '/2';
-    protected const _CONTROLLER= '/3';
-    protected const _NAME = '/4';
-    protected const _PARAMETER = '/5';
+    protected const _MIDDLEWARE = '/1';
+    protected const _CONTROLLER = '/2';
+    protected const _NAME = '/3';
+    protected const _PARAMETER = '/4';
+    protected const _DELAY = '/5';
     protected const _404 = '/404';
     /**
      * 路由列表
@@ -44,6 +44,11 @@ class Router
      */
     protected $_pCall;
     /**
+     * 生成器列表
+     * @var array
+     */
+    private $_generators = [];
+    /**
      * GET参数
      * @var array
      */
@@ -52,7 +57,7 @@ class Router
      * 中间件返回数据
      * @var mixed
      */
-    public $filterMsg;
+    public $mRet;
     /**
      * 返回参数
      * @var mixed
@@ -77,6 +82,8 @@ class Router
      * @param string $name
      */
     static function create(string $name) {
+        if (!class_exists('Acast\\RouterWrapper'))
+            eval('namespace Acast; class RouterWrapper extends Router{}');
         if (isset(self::$routers[$name]))
             Console::fatal("Router \"$name\" already exists.");
         self::$routers[$name] = new self();
@@ -104,25 +111,18 @@ class Router
         unset($this->_pSet);
         if (!($callback instanceof \Closure))
             $callback = \Closure::fromCallable($callback);
-        $callback = \Closure::bind($callback, $this, __CLASS__);
+        $callback = \Closure::bind($callback, $this, 'Acast\\RouterWrapper');
         if (!is_array($methods))
             $methods = [$methods];
-        if (is_null($path)) {
-            if (!isset($this->_tree[self::_404]))
-                $this->_tree[self::_404] = [];
-            $this->_pSet = $this->_tree[self::_404];
-            if (isset($this->_pSet[self::_CALLBACK]))
-                Console::fatal("Conflict detected. Failed to register route.");
-            $this->_pSet[self::_CALLBACK] = $callback;
-            $this->_pSet[self::_IN_FILTER] = [];
-            $this->_pSet[self::_OUT_FILTER] = [];
-            $this->_pSet[self::_CONTROLLER] = [];
-        }
         foreach ($methods as $method) {
             if (!isset($this->_tree[$method]))
                 $this->_tree[$method] = [];
             $this->_pSet = &$this->_tree[$method];
-            foreach ($path as $value) {
+            if (!isset($path)) {
+                if (!isset($this->_pSet[self::_404]))
+                    $this->_pSet[self::_404] = [];
+                $this->_pSet = &$this->_pSet[self::_404];
+            } else foreach ($path as $value) {
                 if (strpos($value, '/') === 0) {
                     if (!isset($this->_pSet[self::_PARAMETER]))
                         $this->_pSet[self::_PARAMETER] = [];
@@ -139,9 +139,9 @@ class Router
             if (isset($this->_pSet[self::_CALLBACK]))
                 Console::fatal("Conflict detected. Failed to register route.");
             $this->_pSet[self::_CALLBACK] = $callback;
-            $this->_pSet[self::_IN_FILTER] = [];
-            $this->_pSet[self::_OUT_FILTER] = [];
+            $this->_pSet[self::_MIDDLEWARE] = [];
             $this->_pSet[self::_CONTROLLER] = [];
+            $this->_pSet[self::_DELAY] = false;
         }
         return $this;
     }
@@ -150,14 +150,13 @@ class Router
      *
      * @param array $path
      * @param string $method
+     * @return bool
      */
-    function locate(array $path, string $method) {
-        unset($this->_pCall, $this->urlParams, $this->retMsg, $this->filterMsg);
+    function locate(array $path, string $method) : bool {
+        unset($this->urlParams, $this->retMsg, $this->mRet);
         $this->method = $method;
-        if (!isset($this->_tree[$method])) {
-            $this->retMsg = View::http(400, 'Invalid method.');
-            return;
-        }
+        if (!isset($this->_tree[$method]))
+            goto Err;
         $this->_pCall = &$this->_tree[$method];
         foreach ($path as $value) {
             if (isset($this->_pCall[$value]))
@@ -166,23 +165,28 @@ class Router
                 $this->_pCall = &$this->_pCall[self::_PARAMETER];
                 $this->urlParams[$this->_pCall[self::_NAME]] = $value;
             } else goto Err;
+            $this->_mPush();
         }
         Loop:
-        if (isset($this->_pCall[self::_CALLBACK])) {
-            $this->call();
-            return;
-        }
+        if (isset($this->_pCall[self::_CALLBACK]))
+            goto Success;
         if (isset($this->_pCall[self::_PARAMETER])) {
             $this->_pCall = &$this->_pCall[self::_PARAMETER];
             $this->urlParams[$this->_pCall[self::_NAME]] = '';
-        } else goto Err;
-        goto Loop;
+            $this->_mPush();
+            goto Loop;
+        }
         Err:
-        if (isset($this->_tree[self::_404][self::_CALLBACK])) {
-            $this->_pCall = &$this->_tree[self::_404];
-            $this->call();
-        } else
-            $this->retMsg = View::http(404, 'Not found.');
+        if (isset($this->_tree[$method][self::_404])) {
+            $this->_pCall = &$this->_tree[$method][self::_404];
+            $this->_mPush();
+            goto Success;
+        }
+        $this->retMsg = View::http(404, 'Not found.');
+        return false;
+        Success:
+        $this->_call();
+        return true;
     }
     /**
      * 路由分发
@@ -190,48 +194,74 @@ class Router
      * @param $name
      * @return bool
      */
-    function dispatch($name) : bool {
-        if (is_array($name)) {
-            foreach ($name as $route) {
-                $this->_pCall = &$this->_alias[$route];
-                if (!$this->call())
-                    return false;
-            }
-            return true;
-        } else {
-            $this->_pCall = &$this->_alias[$name];
-            return $this->call();
+    protected function dispatch($name) : bool {
+        if (!is_array($name))
+            $name = [$name];
+        foreach ($name as $route) {
+            $this->_pCall = &$this->_alias[$route];
+            if (!$this->_routerCall())
+                return false;
         }
+        return true;
     }
     /**
      * 路由事件处理，包括中间件和路由回调
      *
      * @return bool
      */
-    protected function call() : bool {
+    private function _call() : bool {
         if (!isset($this->_pCall)) {
             Console::warning('Failed to call. Invalid pointer.');
             return false;
         }
-        foreach ($this->_pCall[self::_IN_FILTER] as $in_filter) {
-            if (!($in_filter($this->method) ?? true))
+        foreach ($this->_generators as $generator)
+            $generator->current();
+        $ret = $this->_routerCall();
+        while ($generator = array_pop($this->_generators)) {
+            if ($generator->valid())
+                 $generator->next();
+        }
+        unset($this->_generators);
+        return $ret;
+    }
+    /**
+     * 添加生成器
+     */
+    private function _mPush() {
+        $this->_generators[] = self::_mCall($this->_pCall);
+    }
+    /**
+     * 将中间件回调封装到生成器中待调用
+     *
+     * @param $pCall
+     * @return \Generator
+     */
+    private static function _mCall(&$pCall) {
+        if (!isset($pCall[self::_MIDDLEWARE]))
+            return;
+        foreach ($pCall[self::_MIDDLEWARE] as $callback) {
+            if ($pCall[self::_DELAY])
+                yield;
+            $pCall[self::_DELAY] = false;
+            if (!($callback() ?? true))
                 break;
         }
+        yield;
+    }
+    private function _routerCall() : bool {
         $status = $this->connection->getStatus();
         if ($status === TcpConnection::STATUS_CLOSING || $status === TcpConnection::STATUS_CLOSED)
             return false;
         $callback = $this->_pCall[self::_CALLBACK];
         try {
-            $ret = $callback($this->method) ?? true;
+            return $callback() ?? true;
         } catch (\PDOException $exception) {
             $this->retMsg = View::http(500, $exception->getMessage());
-            $ret = false;
+            return false;
         }
-        foreach ($this->_pCall[self::_OUT_FILTER] as $out_filter) {
-            if (!($out_filter($this->method) ?? true))
-                break;
-        }
-        return $ret;
+    }
+    protected function delay() {
+        $this->_pCall[self::_DELAY] = true;
     }
     /**
      * 路由别名，用于实现分发
@@ -248,13 +278,8 @@ class Router
             $names = [$names];
         foreach ($names as $name) {
             if (isset($this->_alias[$name]))
-                Console::notice("Overwriting route alias \"$name\".");
-            $this->_alias[$name] = [
-                self::_CALLBACK => &$this->_pSet[self::_CALLBACK],
-                self::_IN_FILTER => &$this->_pSet[self::_IN_FILTER],
-                self::_OUT_FILTER => &$this->_pSet[self::_OUT_FILTER],
-                self::_CONTROLLER => &$this->_pSet[self::_CONTROLLER],
-            ];
+                Console::warning("Overwriting route alias \"$name\".");
+            $this->_alias[$name] = &$this->_pSet;
         }
         return $this;
     }
@@ -265,7 +290,7 @@ class Router
      * @param mixed $param
      * @return mixed
      */
-    function invoke($name = 0, $param = null) {
+    protected function invoke($name = 0, $param = null) {
         if (!isset($this->_pCall[self::_CONTROLLER][$name])) {
             Console::warning("Invalid controller binding \"$name\".");
             return false;
@@ -319,25 +344,27 @@ class Router
     /**
      * 绑定中间件
      *
-     * @param $filters
+     * @param mixed $names
      * @return Router
      */
-    function filter(array $filters) : self {
+    function middleware($names) : self {
         if (!isset($this->_pSet)) {
-            Console::warning("No route to filter.");
+            Console::warning("No route to bind middleware.");
             return $this;
         }
-        foreach ($filters as $filter => $type) {
-            $callback = Filter::fetch($filter, $type);
+        if (!is_array($names))
+            $names = [$names];
+        foreach ($names as $name) {
+            $callback = Middleware::fetch($name);
             if ($callback) {
                 if (!is_callable($callback)) {
-                    Console::warning('Failed to bind filter. Callback function not callable.');
+                    Console::warning('Failed to bind middleware. Callback function not callable.');
                     continue;
                 }
                 if (!($callback instanceof \Closure))
                     $callback = \Closure::fromCallable($callback);
-                $callback = \Closure::bind($callback, $this, __CLASS__);
-                $this->_pSet[$type == Filter::IN ? self::_IN_FILTER : self::_OUT_FILTER][] = $callback;
+                $callback = \Closure::bind($callback, $this, 'Acast\\RouterWrapper');
+                $this->_pSet[self::_MIDDLEWARE][] = $callback;
             }
         }
         return $this;

@@ -20,7 +20,7 @@ $name为类名（不包括命名空间）。
 
 1. $this-\>urlParams: 拷贝自路由实例。
 
-2. $this-\>filterMsg: 拷贝自路由实例。
+2. $this-\>mRet: 拷贝自路由实例。
 
 3. $this-\>retMsg: 拷贝自路由实例，调用结束后拷贝回路由。
 

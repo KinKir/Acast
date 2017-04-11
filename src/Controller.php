@@ -10,7 +10,7 @@ abstract class Controller {
      * 中间件返回信息
      * @var mixed
      */
-    public $filterMsg;
+    public $mRet;
     /**
      * 返回数据
      * @var mixed
@@ -52,7 +52,7 @@ abstract class Controller {
         $this->method = $route->method;
         $this->urlParams = $route->urlParams ?? [];
         $this->retMsg = $route->retMsg ?? null;
-        $this->filterMsg = $route->filterMsg ?? null;
+        $this->mRet = $route->mRet ?? null;
     }
     /**
      * 调用外部模型

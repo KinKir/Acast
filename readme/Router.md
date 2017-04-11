@@ -42,15 +42,13 @@ Acast提供了当所有路由都无法匹配的时候自动匹配的路由。$pa
 
 ### 绑定中间件
 
-参见[中间件](Filter.md)一章。
+参见[中间件](Middleware.md)一章。
 
 ### 路由别名
 
 > function Router::alias(mixed $name) Router
 
 $name为你将要给该路由设置的别名（以数组的形式可以同时设置多个别名）。给路由设置别名后可以实现路由的分发。
-
-注意，如果你希望别名路由不保留绑定的中间件和控制器，你需要在filter和bind方法之前调用该方法。
 
 ### 路由分发
 
@@ -60,11 +58,13 @@ $name为你将要给该路由设置的别名（以数组的形式可以同时设
 
 $name支持数组。这种情况下，数组中每个路由的回调函数将被依次调用，直至有一个回调函数返回false。
 
+注意，分发后的路由，其回调函数被调用时不会触发中间件。
+
 ### 成员变量说明
 
 1. $this-\>urlParams: 数组，保存通过路由匹配到的Request URI中的参数。
 
-2. $this-\>filterMsg: 建议用该变量保存中间件的返回值以便其他中间件、路由或者控制器使用。
+2. $this-\>mRet: 建议用该变量保存中间件的返回值以便其他中间件、路由或者控制器使用。
 
 3. $this-\>retMsg: 路由回调结束后返回给用户的数据。
 
@@ -75,7 +75,8 @@ $name支持数组。这种情况下，数组中每个路由的回调函数将被
 ### 示例
 
 ```php
-Router::instance('Demo')->add([], ['GET', 'POST'], function () {
+Router::create('demo');
+Router::instance('demo')->add([], ['GET', 'POST'], function () {
     if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $this->dispatch('user');
     } else {
@@ -83,9 +84,10 @@ Router::instance('Demo')->add([], ['GET', 'POST'], function () {
     }
     return false;
 });
-Router::instance('Demo')->add(['user'], 'POST', function () {
-    if ($this->filterMsg) {
-        $this->invoke('showUserName');
+Router::instance('emo')->add(['user'], 'POST', function () {
+    if ($this->mRet) {
+        $this->invoke();
     }
-})->filter(['auth' => Filter::_IN_])->bind(['showUserName', 'User', 'showName'])->alias('user');
+})->middleware('auth')->bind(['User', 'showName'])->alias('user');
+Server::app('demo')->route('demo');
 ```

@@ -65,7 +65,7 @@ abstract class Console {
      */
     static function register(string $name, callable $callback) {
         if (isset(self::$callbacks[$name]))
-            self::notice("Overwriting console callback \"$name\".");
+            self::warning("Overwriting console callback \"$name\".");
         self::$callbacks[$name] = $callback;
     }
     /**

@@ -50,6 +50,16 @@ class Server {
      */
     protected $_listen;
     /**
+     * 服务启动状态
+     * @var int
+     */
+    protected static $_status = 0;
+    /**
+     * 项目配置文件
+     * @var array
+     */
+    public static $_config = [];
+    /**
      * Memcached实例
      * @var \Memcached
      */
@@ -72,14 +82,32 @@ class Server {
         $this->_worker->onWorkerStart = [$this, 'onServerStart'];
         $this->_worker->onWorkerStop = [$this, 'onServerStop'];
         $this->_worker->onMessage = [$this, 'onMessage'];
-        $this->config(DEFAULT_WORKER_CONFIG);
+        $this->workerConfig(DEFAULT_WORKER_CONFIG);
+    }
+    /**
+     * 设置、获取配置项
+     *
+     * @param $config
+     * @return mixed|null
+     */
+    static function config($config) {
+        if (self::$_status > 1) {
+            return self::$_config[$config] ?? null;
+        } else {
+            if (!is_array($config)) {
+                Console::warning('Config param must be an array.');
+                return false;
+            }
+            self::$_config = array_merge($config, self::$_config);
+            return true;
+        }
     }
     /**
      * 配置Workerman
      *
      * @param array $config
      */
-    function config(array $config) {
+    function workerConfig(array $config) {
         foreach ($config as $key => $value) {
             $this->_worker->$key = $value;
         }
@@ -102,6 +130,10 @@ class Server {
      * @param string $listen
      */
     static function create(string $app, string $listen) {
+        if (self::$_status > 0) {
+            Console::warning('Cannot create application once the service is started.');
+            return;
+        }
         if (isset(self::$_apps[$app]))
             Console::fatal("Failed to create app. App \"$app\" exists!");
         self::$_apps[$app] = new self($app, $listen);
@@ -126,6 +158,10 @@ class Server {
      * @param callable $callback
      */
     function event(string $event, callable $callback) {
+        if (self::$_status > 0) {
+            Console::warning('Cannot set event callback once the service is started.');
+            return;
+        }
         if (!is_callable($callback)) {
             Console::warning('Failed to set event callback. Not callable.');
             return;
@@ -153,6 +189,10 @@ class Server {
      * @param string $name
      */
     function route(string $name) {
+        if (self::$_status > 1) {
+            Console::warning('Cannot bind route once the service is started.');
+            return;
+        }
         if (isset($this->_router))
             Console::warning("Overwriting router binding for app \"$this->_name\"");
         $this->_router = Router::instance($name);
@@ -169,6 +209,7 @@ class Server {
             call_user_func($this->_on_start, $worker);
         if (!isset($this->_router) && $this->_listen)
             Console::warning("No router bound to server \"$this->_name\".");
+        self::$_status = 2;
     }
     /**
      * 服务停止回调
@@ -190,6 +231,7 @@ class Server {
                 exit(0);
             }
         }
+        self::$_status = 1;
         Worker::runAll();
     }
 }

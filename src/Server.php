@@ -88,7 +88,7 @@ class Server {
      * 设置、获取配置项
      *
      * @param $config
-     * @return mixed|null
+     * @return mixed
      */
     static function config($config) {
         if (self::$_status > 1) {
@@ -205,6 +205,7 @@ class Server {
     function onServerStart(Worker $worker) {
         self::$name = $this->_name;
         self::$memcache = new \Memcached();
+        pcntl_signal(SIGCHLD, SIG_IGN); //将子进程转交给内核，防止僵尸进程。
         if (is_callable($this->_on_start))
             call_user_func($this->_on_start, $worker);
         if (!isset($this->_router) && $this->_listen)
@@ -233,5 +234,23 @@ class Server {
         }
         self::$_status = 1;
         Worker::runAll();
+    }
+    /**
+     * 在当前位置Fork一个新进程，并执行回调。
+     *
+     * @param callable $callback
+     * @param mixed $variable
+     */
+    static function async(callable $callback, $variable = null) {
+        if (!is_callable($callback)) {
+            Console::warning('Callback function not callable.');
+            return;
+        }
+        $pid = pcntl_fork();
+        if ($pid == 0) {
+            $callback($variable);
+            Worker::$status = Worker::STATUS_SHUTDOWN;
+            exit(0);
+        }
     }
 }

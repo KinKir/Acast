@@ -344,7 +344,7 @@ class Worker
      *
      * @var int
      */
-    protected static $_status = self::STATUS_STARTING;
+    static $status = self::STATUS_STARTING;
 
     /**
      * Maximum length of the worker names.
@@ -473,7 +473,7 @@ class Worker
         }
 
         // State.
-        self::$_status = self::STATUS_STARTING;
+        self::$status = self::STATUS_STARTING;
 
         // For statistics.
         self::$_globalStatistics['start_timestamp'] = time();
@@ -907,7 +907,7 @@ class Worker
     protected static function forkWorkers()
     {
         foreach (self::$_workers as $worker) {
-            if (self::$_status === self::STATUS_STARTING) {
+            if (self::$status === self::STATUS_STARTING) {
                 if (empty($worker->name)) {
                     $worker->name = $worker->getSocketName();
                 }
@@ -947,7 +947,7 @@ class Worker
             if ($worker->reusePort) {
                 $worker->listen();
             }
-            if (self::$_status === self::STATUS_STARTING) {
+            if (self::$status === self::STATUS_STARTING) {
                 self::resetStd();
             }
             self::$_pidMap  = array();
@@ -1034,7 +1034,7 @@ class Worker
      */
     protected static function monitorWorkers()
     {
-        self::$_status = self::STATUS_RUNNING;
+        self::$status = self::STATUS_RUNNING;
         while (1) {
             // Calls signal handlers for pending signals.
             pcntl_signal_dispatch();
@@ -1071,7 +1071,7 @@ class Worker
                     }
                 }
                 // Is still running state then fork a new worker process.
-                if (self::$_status !== self::STATUS_SHUTDOWN) {
+                if (self::$status !== self::STATUS_SHUTDOWN) {
                     self::forkWorkers();
                     // If reloading continue.
                     if (isset(self::$_pidsToRestart[$pid])) {
@@ -1086,7 +1086,7 @@ class Worker
                 }
             } else {
                 // If shutdown state and all child processes exited then master process exit.
-                if (self::$_status === self::STATUS_SHUTDOWN && !self::getAllWorkerPids()) {
+                if (self::$status === self::STATUS_SHUTDOWN && !self::getAllWorkerPids()) {
                     self::exitAndClearAll();
                 }
             }
@@ -1125,9 +1125,9 @@ class Worker
         // For master process.
         if (self::$_masterPid === posix_getpid()) {
             // Set reloading state.
-            if (self::$_status !== self::STATUS_RELOADING && self::$_status !== self::STATUS_SHUTDOWN) {
+            if (self::$status !== self::STATUS_RELOADING && self::$status !== self::STATUS_SHUTDOWN) {
                 self::log("Workerman[" . basename(self::$_startFile) . "] reloading");
-                self::$_status = self::STATUS_RELOADING;
+                self::$status = self::STATUS_RELOADING;
                 // Try to emit onMasterReload callback.
                 if (self::$onMasterReload) {
                     try {
@@ -1164,8 +1164,8 @@ class Worker
 
             // Reload complete.
             if (empty(self::$_pidsToRestart)) {
-                if (self::$_status !== self::STATUS_SHUTDOWN) {
-                    self::$_status = self::STATUS_RUNNING;
+                if (self::$status !== self::STATUS_SHUTDOWN) {
+                    self::$status = self::STATUS_RUNNING;
                 }
                 return;
             }
@@ -1204,7 +1204,7 @@ class Worker
      */
     public static function stopAll()
     {
-        self::$_status = self::STATUS_SHUTDOWN;
+        self::$status = self::STATUS_SHUTDOWN;
         // For master process.
         if (self::$_masterPid === posix_getpid()) {
             self::log("Workerman[" . basename(self::$_startFile) . "] Stopping ...");
@@ -1301,7 +1301,7 @@ class Worker
      */
     public static function checkErrors()
     {
-        if (self::STATUS_SHUTDOWN != self::$_status) {
+        if (self::STATUS_SHUTDOWN != self::$status) {
             $error_msg = "WORKER EXIT UNEXPECTED ";
             $errors    = error_get_last();
             if ($errors && ($errors['type'] === E_ERROR ||
@@ -1514,7 +1514,7 @@ class Worker
     public function run()
     {
         //Update process state.
-        self::$_status = self::STATUS_RUNNING;
+        self::$status = self::STATUS_RUNNING;
 
         // Register shutdown function for checking errors.
         register_shutdown_function(array("\\Workerman\\Worker", 'checkErrors'));

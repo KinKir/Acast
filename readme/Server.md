@@ -45,7 +45,7 @@ Acast服务提供者的事件是对Workerman事件的一个封装，要求用户
 
 ### Worker配置
 
-> function Server::config(array $config) void
+> function Server::workerConfig(array $config) void
 
 你可以方便地在服务提供者中配置Worker。如名称、进程数等。如下所示：
 
@@ -56,8 +56,24 @@ Server::app('Demo')->config([
 ]);
 ```
 
+### 配置项
+
+> function Server::config(mixed $config) mixed
+
+在服务尚未启动时，该方法用于配置全局常量。$config为key-value型数组。多次调用该方法会merge新值与旧值。
+
+在服务已经启动时，该方法用于获取配置项的值。$config为配置项的键。返回配置项的值。
+
 ### 启动服务
 
 > static function Server::start() void
 
 执行服务启动前的初始化操作，并调用Worker::runAll()方法，启动所有Worker。
+
+## 异步操作
+
+> static function Server::async(callable $callback, mixed $param = null) void
+
+创建一个子进程，并在子进程中执行回调函数，执行完成后，子进程会立即退出。
+
+该静态方法在调用后会立即返回。

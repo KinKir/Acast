@@ -239,16 +239,16 @@ class Server {
      * 在当前位置Fork一个新进程，并执行回调。
      *
      * @param callable $callback
-     * @param mixed $variable
+     * @param mixed $param
      */
-    static function async(callable $callback, $variable = null) {
+    static function async(callable $callback, $param = null) {
         if (!is_callable($callback)) {
             Console::warning('Callback function not callable.');
             return;
         }
         $pid = pcntl_fork();
         if ($pid == 0) {
-            $callback($variable);
+            $callback($param);
             Worker::$status = Worker::STATUS_SHUTDOWN;
             exit(0);
         }

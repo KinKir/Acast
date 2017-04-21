@@ -236,21 +236,25 @@ class Server {
         Worker::runAll();
     }
     /**
-     * 在当前位置Fork一个新进程，并执行回调。
+     * 在当前位置创建一个子进程，并执行回调。
      *
      * @param callable $callback
-     * @param mixed $param
+     * @param mixed $variables
+     * @return int;
      */
-    static function async(callable $callback, $param = null) {
+    static function async(callable $callback, $variables = null) {
         if (!is_callable($callback)) {
             Console::warning('Callback function not callable.');
-            return;
+            return 0;
         }
         $pid = pcntl_fork();
         if ($pid == 0) {
-            $callback($param);
+            if (!is_array($variables))
+                $variables = [$variables];
+            call_user_func_array($callback, $variables);
             Worker::$status = Worker::STATUS_SHUTDOWN;
             exit(0);
         }
+        return $pid;
     }
 }

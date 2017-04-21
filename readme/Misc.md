@@ -34,6 +34,8 @@ sudo service memcached start
 
 ### Workerman
 
-注意，Workerman无法在Acast中直接使用。请在Workerman\\Connection中加入getStatus\(\)方法。
+注意，Workerman无法在Acast中直接使用。请在Workerman\\Connection中加入getStatus\(\)方法，并在Workerman\\Worker中将status成员改为公有。
 
 请将Workerman\\Connection至于Workerman\\Lib目录下，并将命名空间改为Workerman\\Lib，以便Autoloader自动载入。
+
+建议使用本项目内附带的Workerman，该Workerman副本会随时更新，并不断被修改优化以适应于Acast的Web开发。

@@ -7,6 +7,9 @@ use Workerman\Lib\Connection;
  * @package Acast
  */
 abstract class Model {
+    const ALL = 'query';
+    const ROW = 'row';
+    const SINGLE = 'single';
     /**
      * 数据库配置项
      * @var array
@@ -53,9 +56,13 @@ abstract class Model {
      * @param array|null $bind
      * @param array|null $order_by
      * @param array|null $limit
+     * @param string $return
      * @return mixed
      */
-    function select($cols, $where = null, ?array $bind = null, ?array $order_by = null, ?array $limit = null) {
+    function select($cols, $where = null,
+                    ?array $bind = null,
+                    ?array $order_by = null,
+                    ?array $limit = null, string $return = self::ALL) {
         $query = self::Db()->select($cols)->from($this->_table);
         if (isset($where))
             $query->where($where);
@@ -65,7 +72,7 @@ abstract class Model {
             $query->bindValues($bind);
         if (isset($limit))
             $query->offset($limit[0])->limit($limit[1]);
-        return $query->query();
+        return $query->$return();
     }
     /**
      * MySQL INSERT

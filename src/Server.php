@@ -129,7 +129,7 @@ class Server {
      * @param string $app
      * @param string $listen
      */
-    static function create(string $app, string $listen) {
+    static function create(string $app, ?string $listen = null) {
         if (self::$_status > 0) {
             Console::warning('Cannot create application once the service is started.');
             return;
@@ -256,5 +256,13 @@ class Server {
             exit(0);
         }
         return $pid;
+    }
+    /**
+     * 获取运行状态
+     *
+     * @return int
+     */
+    static function getStatus() {
+        return self::$_status;
     }
 }

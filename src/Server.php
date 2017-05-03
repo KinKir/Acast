@@ -225,6 +225,14 @@ class Server {
      * 启动所有服务
      */
     static function start() {
+        if (version_compare(phpversion(), '7.1.0', '<')) {
+            echo "PHP version must be 7.1 or above.\n";
+            exit(10);
+        }
+        if (php_sapi_name() != 'cli') {
+            echo "Acast can only run in CLI mode.\n";
+            exit(11);
+        }
         if (count($_SERVER['argv']) > 1) {
             $name = $_SERVER['argv'][1];
             if (in_array($name, array_keys(Console::$callbacks))) {

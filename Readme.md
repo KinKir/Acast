@@ -92,6 +92,14 @@ Acast的视图可以很好地与[Plates](http://platesphp.com/)等模版兼容�
 
 有关视图的详细文档，见[这里](readme/View.md)。
 
+#### 迁移
+
+这里迁移指数据库迁移。目前，Acast支持格式化并执行指定SQL模版的方式实现数据库的初始化。
+
+以后可能将加入数据导出功能。
+
+有关数据库迁移的详细文档，见[这里](readme/Migrate.md)。
+
 #### 其他
 
 有关Acast的其他功能及使用时的注意事项，见[这里](readme/Misc.md)。

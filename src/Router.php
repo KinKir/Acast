@@ -17,6 +17,7 @@ class Router
     protected const _NAME = '/3';
     protected const _PARAMETER = '/4';
     protected const _DELAY = '/5';
+    protected const _SIBLINGS = '/6';
     protected const _404 = '/404';
     /**
      * 路由列表
@@ -114,6 +115,7 @@ class Router
         $callback = \Closure::bind($callback, $this, 'Acast\\RouterWrapper');
         if (!is_array($methods))
             $methods = [$methods];
+        $siblings = [];
         foreach ($methods as $method) {
             if (!isset($this->_tree[$method]))
                 $this->_tree[$method] = [];
@@ -142,7 +144,10 @@ class Router
             $this->_pSet[self::_MIDDLEWARE] = [];
             $this->_pSet[self::_CONTROLLER] = [];
             $this->_pSet[self::_DELAY] = false;
+            $siblings[] = &$this->_pSet;
         }
+        foreach ($siblings as &$sibling)
+            $sibling[self::_SIBLINGS] = &$siblings;
         return $this;
     }
     /**
@@ -158,6 +163,7 @@ class Router
         if (!isset($this->_tree[$method]))
             goto Err;
         $this->_pCall = &$this->_tree[$method];
+        $this->_mPush();
         foreach ($path as $value) {
             if (isset($this->_pCall[$value]))
                 $this->_pCall = &$this->_pCall[$value];
@@ -221,7 +227,7 @@ class Router
             if ($generator->valid())
                  $generator->next();
         }
-        unset($this->_generators);
+        $this->_generators = [];
         return $ret;
     }
     /**
@@ -317,35 +323,37 @@ class Router
      * @return Router
      */
     function bind(array $controllers) : self {
-        if (!isset($this->_pSet)) {
+        if (!isset($this->_pSet[self::_SIBLINGS])) {
             Console::warning("No route to bind.");
             return $this;
         }
         if (!is_array($controllers[0]))
             $controllers = [$controllers];
-        foreach ($controllers as $controller) {
-            $count = count($controller);
-            if ($count == 3)
-                [$name, $controller, $method] = $controller;
-            elseif ($count == 2) {
-                [$controller, $method] = $controller;
-                $name = count($this->_pSet[self::_CONTROLLER]);
-            } else {
-                Console::warning("Invalid controller binding,");
-                continue;
+        foreach ($this->_pSet[self::_SIBLINGS] as &$pSet) {
+            foreach ($controllers as $controller) {
+                $count = count($controller);
+                if ($count == 3)
+                    [$name, $controller, $method] = $controller;
+                elseif ($count == 2) {
+                    [$controller, $method] = $controller;
+                    $name = count($this->_pSet[self::_CONTROLLER]);
+                } else {
+                    Console::warning("Invalid controller binding,");
+                    continue;
+                }
+                $controller = Server::$name.'\\Controller\\'.$controller;
+                if (!class_exists($controller) || !is_subclass_of($controller, Controller::class)) {
+                    Console::warning("Invalid controller \"$controller\".");
+                    return $this;
+                }
+                if (!method_exists($controller, $method)) {
+                    Console::warning("Invalid method \"$method\".");
+                    return $this;
+                }
+                if (isset($pSet[self::_CONTROLLER][$name]))
+                    Console::warning("Overwriting controller binding \"$name\"");
+                $pSet[self::_CONTROLLER][$name] = [$controller, $method];
             }
-            $controller = Server::$name.'\\Controller\\'.$controller;
-            if (!class_exists($controller) || !is_subclass_of($controller, Controller::class)) {
-                Console::warning("Invalid controller \"$controller\".");
-                return $this;
-            }
-            if (!method_exists($controller, $method)) {
-                Console::warning("Invalid method \"$method\".");
-                return $this;
-            }
-            if (isset($this->_pSet[self::_CONTROLLER][$name]))
-                Console::warning("Overwriting controller binding \"$name\"");
-            $this->_pSet[self::_CONTROLLER][$name] = [$controller, $method];
         }
         return $this;
     }
@@ -356,23 +364,25 @@ class Router
      * @return Router
      */
     function middleware($names) : self {
-        if (!isset($this->_pSet)) {
+        if (!isset($this->_pSet[self::_SIBLINGS])) {
             Console::warning("No route to bind middleware.");
             return $this;
         }
         if (!is_array($names))
             $names = [$names];
-        foreach ($names as $name) {
-            $callback = Middleware::fetch($name);
-            if ($callback) {
-                if (!is_callable($callback)) {
-                    Console::warning('Failed to bind middleware. Callback function not callable.');
-                    continue;
+        foreach ($this->_pSet[self::_SIBLINGS] as &$pSet) {
+            foreach ($names as $name) {
+                $callback = Middleware::fetch($name);
+                if ($callback) {
+                    if (!is_callable($callback)) {
+                        Console::warning('Failed to bind middleware. Callback function not callable.');
+                        continue;
+                    }
+                    if (!($callback instanceof \Closure))
+                        $callback = \Closure::fromCallable($callback);
+                    $callback = \Closure::bind($callback, $this, 'Acast\\RouterWrapper');
+                    $pSet[self::_MIDDLEWARE][] = $callback;
                 }
-                if (!($callback instanceof \Closure))
-                    $callback = \Closure::fromCallable($callback);
-                $callback = \Closure::bind($callback, $this, 'Acast\\RouterWrapper');
-                $this->_pSet[self::_MIDDLEWARE][] = $callback;
             }
         }
         return $this;

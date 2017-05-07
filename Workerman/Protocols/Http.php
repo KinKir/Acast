@@ -22,9 +22,9 @@ use Workerman\Worker;
 class Http
 {
     /**
-      * The supported HTTP methods
-      * @var array
-      */
+     * The supported HTTP methods
+     * @var array
+     */
     public static $methods = array('GET', 'POST', 'PUT', 'DELETE', 'HEAD', 'OPTIONS');
 
     /**
@@ -57,15 +57,15 @@ class Http
     }
 
     /**
-      * Get whole size of the request
-      * includes the request headers and request body.
-      * @param string $header The request headers
-      * @param string $method The request method
-      * @return integer
-      */
+     * Get whole size of the request
+     * includes the request headers and request body.
+     * @param string $header The request headers
+     * @param string $method The request method
+     * @return integer
+     */
     protected static function getRequestSize($header, $method)
     {
-        if($method=='GET') {
+        if ($method == 'GET' || $method == 'OPTIONS' || $method == 'HEAD') {
             return strlen($header) + 4;
         }
         $match = array();
@@ -161,10 +161,14 @@ class Http
         if ($_SERVER['REQUEST_METHOD'] === 'POST' ||
             $_SERVER['REQUEST_METHOD'] === 'PUT' ||
             $_SERVER['REQUEST_METHOD'] === 'DELETE') {
-            if (isset($_SERVER['CONTENT_TYPE']) && $_SERVER['CONTENT_TYPE'] === 'multipart/form-data') {
-                self::parseUploadFiles($http_body, $http_post_boundary);
+            if (isset($_SERVER['CONTENT_TYPE'])) {
+                if ($_SERVER['CONTENT_TYPE'] === 'multipart/form-data')
+                    self::parseUploadFiles($http_body, $http_post_boundary);
+                elseif ($_SERVER['CONTENT_TYPE'] === 'application/json')
+                    $_POST = json_decode($http_body, true, 5);
+                else goto p;
             } else {
-                parse_str($http_body, $_POST);
+                p: parse_str($http_body, $_POST);
             }
         }
 
@@ -206,7 +210,7 @@ class Http
 
         // Content-Type
         if (!isset(HttpCache::$header['Content-Type'])) {
-            $header .= "Content-Type: text/html;charset=utf-8\r\n";
+            $header .= "Content-Type: text/plain;charset=utf-8\r\n";
         }
 
         // other headers
@@ -360,7 +364,6 @@ class Http
      */
     public static function sessionWriteClose()
     {
-
         if (!empty(HttpCache::$instance->sessionStarted) && !empty($_SESSION)) {
             $session_str = session_encode();
             if ($session_str && HttpCache::$instance->sessionFile) {

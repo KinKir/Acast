@@ -4,18 +4,21 @@
 
 ### 新建服务
 
-> static function Server::create(string $app, int $listen) void
+> static function Server::create(string $app, int $listen, ?array $ssl) void
 
 事实上，每一个服务提供者是对一个Workerman的Worker示例的封装。和Acast框架的所有其他组件一样，它位于Acast命名空间下。
 
-如下所示，调用静态方法create，创建一个名为Demo的服务，监听本地8080端口。
+$listen为服务监听的端口。
+
+如果需要提供HTTPS服务，$ssl格式应满足以下示例中格式，否则为空：
 
 ```php
-use Acast\Server;
-Server::create('Demo', 8080);
+Server::create('demo', 443, [
+    'local_cert' => '/path/to/cert',
+    'local_pk' => '/path/to/private/key',
+    'verify_peer' => false
+]);
 ```
-
-注意，此时，服务只是被注册，并没有启动。
 
 ### 获取服务
 
@@ -55,6 +58,8 @@ Server::app('Demo')->config([
     'count' => 4
 ]);
 ```
+
+详细配置项见Workerman文档
 
 ### 配置项
 

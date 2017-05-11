@@ -26,11 +26,13 @@ $config为MySQL配置数据，格式为\[$host, $port, $user, $password, $db_nam
 
 Acast\\Model提供了一些便捷的方法，方便进行一些基本的CURD操作。
 
-> function View::select($cols, array $where, ?array $bind = null, ?array $order_by = null, ?array $limit = null) mixed
+> function Model::select($cols, $where = null, ?array $bind = null, ?array $order_by = null, ?array $limit = null) mixed
 
-> function insert(array $cols, ?array $bind = null) mixed
+> function Model::insert(array $cols, ?array $bind = null) mixed
 
-> function update($cols, array $where, ?array $bind = null, ?int $limit = null) mixed
+> function Model::update($cols, $where = null, ?array $bind = null, ?int $limit = null) mixed
+
+> function Model::delete($where = null, ?array $bind = null, ?int $limit = null) mixed
 
 以上操作需要通过View::table()方法绑定数据表。一般来说，一个控制器不止操作一个数据表，因此，这个方法不是十分实用。
 

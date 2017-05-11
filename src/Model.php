@@ -107,6 +107,24 @@ abstract class Model {
         return $query->query();
     }
     /**
+     * MySQL DELETE
+     *
+     * @param mixed $where
+     * @param array|null $bind
+     * @param int|null $limit
+     * @return mixed
+     */
+    function delete($where = null, ?array $bind = null, ?int $limit = null) {
+        $query = self::Db()->delete($this->_table);
+        if (isset($where))
+            $query->where($where);
+        if (isset($bind))
+            $query->bindValues($bind);
+        if (isset($limit))
+            $query->limit($limit);
+        return $query->query();
+    }
+    /**
      * 绑定表
      *
      * @param string $table

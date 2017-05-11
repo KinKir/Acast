@@ -74,11 +74,17 @@ class Server {
      *
      * @param string $name
      * @param int|null $listen
+     * @param array $ssl
      */
-    protected function __construct(string $name, ?int $listen) {
+    protected function __construct(string $name, ?int $listen, array $ssl = null) {
         $this->_name = $name;
         $this->_listen = isset($listen);
-        $this->_worker = new Worker($this->_listen ? 'http://[::]:'.$listen : '');
+        $this->_worker = new Worker(
+            $this->_listen ? 'http://[::]:'.$listen : '',
+            $ssl ? ['ssl' => $ssl] : []
+        );
+        if ($ssl)
+            $this->_worker->transport = 'ssl';
         $this->_worker->onWorkerStart = [$this, 'onServerStart'];
         $this->_worker->onWorkerStop = [$this, 'onServerStop'];
         $this->_worker->onMessage = [$this, 'onMessage'];
@@ -128,15 +134,16 @@ class Server {
      *
      * @param string $app
      * @param string $listen
+     * @param array $ssl
      */
-    static function create(string $app, ?string $listen = null) {
+    static function create(string $app, ?string $listen = null, ?array $ssl = null) {
         if (self::$_status > 0) {
             Console::warning('Cannot create application once the service is started.');
             return;
         }
         if (isset(self::$_apps[$app]))
             Console::fatal("Failed to create app. App \"$app\" exists!");
-        self::$_apps[$app] = new self($app, $listen);
+        self::$_apps[$app] = new self($app, $listen, $ssl);
     }
     /**
      * 收到请求回调

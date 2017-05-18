@@ -11,5 +11,4 @@ const WORKERMAN_ROOT = __DIR__ . '/Workerman';
 const DEFAULT_WORKER_CONFIG = [
     'count' => 4,
     'name' => 'AcastHttpWorker',
-    'reusePort' => true
 ];

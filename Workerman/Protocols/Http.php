@@ -81,7 +81,7 @@ class Http
      *
      * @param string        $recv_buffer
      * @param TcpConnection $connection
-     * @return array
+     * @return string
      */
     public static function decode($recv_buffer, TcpConnection $connection)
     {
@@ -188,7 +188,7 @@ class Http
         $_SERVER['REMOTE_ADDR'] = $connection->getRemoteIp();
         $_SERVER['REMOTE_PORT'] = $connection->getRemotePort();
 
-        return array();
+        return $recv_buffer;
     }
 
     /**

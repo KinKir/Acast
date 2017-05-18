@@ -18,18 +18,14 @@ if (!ini_get('date.timezone')) {
 }
 // Display errors.
 ini_set('display_errors', 'on');
-// Reporting all.
-error_reporting(E_ALL);
+// Reporting all except notices.
+error_reporting(E_ALL & ~E_NOTICE);
 
 // For onError callback.
 define('WORKERMAN_CONNECT_FAIL', 1);
 // For onError callback.
 define('WORKERMAN_SEND_FAIL', 2);
 
-// Compatible with php7
-if(!class_exists('Error'))
-{
-    class Error extends Exception
-    {
-    }
-}
+// Reset Zend Opcache
+if (function_exists('opcache_reset'))
+    opcache_reset();

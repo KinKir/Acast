@@ -20,6 +20,8 @@ Server::create('demo', 443, [
 ]);
 ```
 
+注意，如果使用了HTTPS，PHP必须安装有openssl扩展。
+
 ### 获取服务
 
 > static function Server::app(string $app) Server
@@ -58,6 +60,10 @@ Server::app('Demo')->config([
     'count' => 4
 ]);
 ```
+
+也可以获取Worker实例的属性
+
+> function Server::getWorkerProperty(string $name) mixed
 
 详细配置项见Workerman文档
 

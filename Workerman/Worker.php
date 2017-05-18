@@ -15,11 +15,13 @@ namespace Workerman;
 
 require_once __DIR__ . '/Lib/Constants.php';
 
-use Workerman\Events\EventInterface;
-use Workerman\Connection\ConnectionInterface;
-use Workerman\Connection\TcpConnection;
-use Workerman\Connection\UdpConnection;
-use Workerman\Lib\Timer;
+use Workerman\ {
+    Events\EventInterface,
+    Connection\ConnectionInterface,
+    Connection\TcpConnection,
+    Connection\UdpConnection,
+    Lib\Timer
+};
 use Exception;
 
 /**
@@ -33,7 +35,7 @@ class Worker
      *
      * @var string
      */
-    const VERSION = '3.4.0';
+    const VERSION = '3.4.2';
 
     /**
      * Status starting.
@@ -970,6 +972,7 @@ class Worker
      *
      * @param int $worker_id
      * @param int $pid
+     * @return mixed
      */
     protected static function getId($worker_id, $pid)
     {

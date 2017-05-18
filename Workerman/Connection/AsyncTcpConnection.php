@@ -152,12 +152,12 @@ class AsyncTcpConnection extends TcpConnection
     /**
      * Do connect.
      *
-     * @return void 
+     * @return void
      */
     public function connect()
     {
         if ($this->_status !== self::STATUS_INITIAL && $this->_status !== self::STATUS_CLOSING &&
-             $this->_status !== self::STATUS_CLOSED) {
+            $this->_status !== self::STATUS_CLOSED) {
             return;
         }
         $this->_status           = self::STATUS_CONNECTING;
@@ -207,7 +207,7 @@ class AsyncTcpConnection extends TcpConnection
     /**
      * Get remote address.
      *
-     * @return string 
+     * @return string
      */
     public function getRemoteHost()
     {
@@ -277,8 +277,9 @@ class AsyncTcpConnection extends TcpConnection
             if ($this->_sendBuffer) {
                 Worker::$globalEvent->add($socket, EventInterface::EV_WRITE, array($this, 'baseWrite'));
             }
-            $this->_status        = self::STATUS_ESTABLISH;
-            $this->_remoteAddress = $address;
+            $this->_status                = self::STATUS_ESTABLISH;
+            $this->_remoteAddress         = $address;
+            $this->_sslHandshakeCompleted = true;
 
             // Try to emit onConnect callback.
             if ($this->onConnect) {

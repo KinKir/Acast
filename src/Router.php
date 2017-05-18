@@ -1,7 +1,10 @@
 <?php
 
 namespace Acast;
-use Workerman\Connection\TcpConnection;
+use Workerman\ {
+    Connection\AsyncTcpConnection,
+    Connection\TcpConnection
+};
 /**
  * 路由
  * @package Acast
@@ -74,6 +77,11 @@ class Router
      * @var string
      */
     public $method;
+    /**
+     * 完整HTTP请求内容
+     * @var string
+     */
+    public $rawRequest;
     /**
      * 构造函数
      */
@@ -315,6 +323,22 @@ class Router
         $ret = $object->$method($param);
         $this->retMsg = $object->retMsg;
         return $ret;
+    }
+    /**
+     * 转发HTTP请求
+     *
+     * @param string $url
+     */
+    protected function forward(string $url) {
+        $this->connection->forward = true;
+        if (!($this->connection->remote instanceof AsyncTcpConnection))
+            $this->connection->remote = new AsyncTcpConnection($url);
+        $this->connection->remote->pipe($this->connection);
+        $this->connection->onClose = function () {
+            $this->connection->remote->close();
+        };
+        $this->connection->remote->connect();
+        $this->connection->remote->send($this->rawRequest);
     }
     /**
      * 绑定控制器及其方法

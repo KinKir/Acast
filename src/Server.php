@@ -1,7 +1,7 @@
 <?php
 
 namespace Acast;
-use Workerman\ {
+use Workerman\{
     Worker, Connection\TcpConnection
 };
 /**
@@ -58,7 +58,7 @@ class Server {
      * 项目配置文件
      * @var array
      */
-    public static $_config = [];
+    protected static $_config = [];
     /**
      * Memcached实例
      * @var \Memcached
@@ -69,6 +69,11 @@ class Server {
      * @var string
      */
     static $name;
+    /**
+     * 是否转发
+     * @var bool
+     */
+    static $forward;
     /**
      * 构造函数
      *
@@ -149,14 +154,19 @@ class Server {
      * 收到请求回调
      *
      * @param TcpConnection $connection
+     * @param string $data
      */
-    function onMessage(TcpConnection $connection) {
+    function onMessage(TcpConnection $connection, $data) {
         $this->_router->connection = $this->_connection = $connection;
+        $connection->forward = false;
         $path = explode('/', substr($_SERVER['REQUEST_URI'], 1));
         if (empty($path[0]) && count($path) == 1)
             $path = [];
+        $this->_router->rawRequest = $data;
         $this->_router->locate($path, $_SERVER['REQUEST_METHOD']);
-        $connection->close($this->_router->retMsg ?? '');
+        if (($connection->forward ?? false) == true)
+            return;
+        $connection->send($this->_router->retMsg ?? '');
     }
     /**
      * 绑定事件回调
@@ -279,5 +289,18 @@ class Server {
      */
     static function getStatus() {
         return self::$_status;
+    }
+    /**
+     * 获取Worker配置参数
+     *
+     * @param $name
+     * @return mixed
+     */
+    function getWorkerProperty(string $name) {
+        if (!($this->_worker instanceof Worker)) {
+            Console::warning('Worker not initialized.');
+            return false;
+        }
+        return $this->_worker->$name;
     }
 }

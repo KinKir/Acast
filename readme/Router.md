@@ -64,9 +64,19 @@ $name支持数组。这种情况下，数组中每个路由的回调函数将被
 
 有时候，对于某些路由，我们需要转发到提供服务的其他端口，如npm的serve，此时，我们可以使用forward方法。
 
-> function Router::forward(string $url) void
+> function Router::forward(string $name) void
 
-$url为要转发到的地址。如"tcp://127.0.0.1:8080"，地址不仅限于本机。
+$name为要转发到的地址的别名，需要在服务启动前使用Server::config设置，前缀为"REMOTE\_"。
+
+```php
+Server::config([
+    'REMOTE_NEW' => 'tcp://127.0.0.1:8080'
+]);
+//...
+Router::instance('demo')->add(['new'], 'GET', function () {
+    $this->forward('NEW');
+});
+```
 
 调用此方法后，建议不要向当前连接的客户端发送任何数据，以免冲突。
 

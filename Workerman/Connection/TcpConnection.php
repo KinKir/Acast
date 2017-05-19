@@ -136,6 +136,12 @@ class TcpConnection extends ConnectionInterface
     protected $_id = 0;
 
     /**
+     * Remote connections utilized by Acast
+     * @var array
+     */
+    public $remotes = [];
+
+    /**
      * Sets the maximum send buffer size for the current connection.
      * OnBufferFull callback will be emited When the send buffer is full.
      *

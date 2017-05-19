@@ -327,18 +327,19 @@ class Router
     /**
      * 转发HTTP请求
      *
-     * @param string $url
+     * @param string $name
      */
-    protected function forward(string $url) {
+    protected function forward(string $name) {
         $this->connection->forward = true;
-        if (!($this->connection->remote instanceof AsyncTcpConnection))
-            $this->connection->remote = new AsyncTcpConnection($url);
-        $this->connection->remote->pipe($this->connection);
-        $this->connection->onClose = function () {
-            $this->connection->remote->close();
+        if (!isset($this->connection->remotes[$name]))
+            $this->connection->remotes[$name] = new AsyncTcpConnection(Server::config('FORWARD_'.$name));
+        $remote = $this->connection->remotes[$name];
+        $remote->pipe($this->connection);
+        $this->connection->onClose = function () use ($remote) {
+            $remote->close();
         };
-        $this->connection->remote->connect();
-        $this->connection->remote->send($this->rawRequest);
+        $remote->connect();
+        $remote->send($this->rawRequest);
     }
     /**
      * 绑定控制器及其方法

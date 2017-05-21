@@ -66,7 +66,7 @@ $name支持数组。这种情况下，数组中每个路由的回调函数将被
 
 > function Router::forward(string $name) void
 
-$name为要转发到的地址的别名，需要在服务启动前使用Server::config设置，前缀为"FORWARD\_"。
+$name为要转发到的地址的别名，需要在服务启动前使用Config::set\(\)设置，前缀为"FORWARD\_"。
 
 ```php
 Server::config([

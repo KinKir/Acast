@@ -332,7 +332,7 @@ class Router
     protected function forward(string $name) {
         $this->connection->forward = true;
         if (!isset($this->connection->remotes[$name]))
-            $this->connection->remotes[$name] = new AsyncTcpConnection(Server::config('FORWARD_'.$name));
+            $this->connection->remotes[$name] = new AsyncTcpConnection(Config::get('FORWARD_'.$name));
         $remote = $this->connection->remotes[$name];
         $remote->pipe($this->connection);
         $this->connection->onClose = function () use ($remote) {

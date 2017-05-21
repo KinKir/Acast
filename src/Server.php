@@ -10,6 +10,12 @@ use Workerman\{
  */
 class Server {
     /**
+     * 服务状态
+     */
+    protected const _STATUS_INITIAL = 0;
+    protected const _STATUS_STARTING = 1;
+    protected const _STATUS_STARTED = 2;
+    /**
      * 服务列表
      * @var array
      */
@@ -53,12 +59,7 @@ class Server {
      * 服务启动状态
      * @var int
      */
-    protected static $_status = 0;
-    /**
-     * 项目配置文件
-     * @var array
-     */
-    protected static $_config = [];
+    protected static $_status = self::_STATUS_INITIAL;
     /**
      * Memcached实例
      * @var \Memcached
@@ -96,24 +97,6 @@ class Server {
         $this->workerConfig(DEFAULT_WORKER_CONFIG);
     }
     /**
-     * 设置、获取配置项
-     *
-     * @param $config
-     * @return mixed
-     */
-    static function config($config) {
-        if (self::$_status > 1) {
-            return self::$_config[$config] ?? null;
-        } else {
-            if (!is_array($config)) {
-                Console::warning('Config param must be an array.');
-                return false;
-            }
-            self::$_config = array_merge($config, self::$_config);
-            return true;
-        }
-    }
-    /**
      * 配置Workerman
      *
      * @param array $config
@@ -142,7 +125,7 @@ class Server {
      * @param array $ssl
      */
     static function create(string $app, ?string $listen = null, ?array $ssl = null) {
-        if (self::$_status > 0) {
+        if (self::$_status > self::_STATUS_INITIAL) {
             Console::warning('Cannot create application once the service is started.');
             return;
         }
@@ -175,7 +158,7 @@ class Server {
      * @param callable $callback
      */
     function event(string $event, callable $callback) {
-        if (self::$_status > 0) {
+        if (self::$_status > self::_STATUS_INITIAL) {
             Console::warning('Cannot set event callback once the service is started.');
             return;
         }
@@ -206,7 +189,7 @@ class Server {
      * @param string $name
      */
     function route(string $name) {
-        if (self::$_status > 1) {
+        if (self::$_status > self::_STATUS_STARTING) {
             Console::warning('Cannot bind route once the service is started.');
             return;
         }
@@ -227,7 +210,7 @@ class Server {
             call_user_func($this->_on_start, $worker);
         if (!isset($this->_router) && $this->_listen)
             Console::warning("No router bound to server \"$this->_name\".");
-        self::$_status = 2;
+        self::$_status = self::_STATUS_STARTED;
     }
     /**
      * 服务停止回调
@@ -257,7 +240,7 @@ class Server {
                 exit(0);
             }
         }
-        self::$_status = 1;
+        self::$_status = self::_STATUS_STARTING;
         Worker::runAll();
     }
     /**

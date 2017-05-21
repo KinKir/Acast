@@ -67,14 +67,6 @@ Server::app('Demo')->config([
 
 详细配置项见Workerman文档
 
-### 配置项
-
-> function Server::config(mixed $config) mixed
-
-在服务尚未启动时，该方法用于配置全局常量。$config为key-value型数组。多次调用该方法会merge新值与旧值。
-
-在服务已经启动时，该方法用于获取配置项的值。$config为配置项的键。返回配置项的值。
-
 ### 启动服务
 
 > static function Server::start() void

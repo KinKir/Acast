@@ -69,11 +69,13 @@ Server::app('Demo')->config([
 
 ### 启动服务
 
-> static function Server::start() void
+> static function Server::start(?callable $callback = null) void
 
 在全局的初始化工作后调用此静态方法，用于启动、停止、重启服务等。
 
 命令行参数会被处理，如果与Console类中注册的函数相匹配，则调用对应函数，然后结束运行。
+
+$callback回调将会在Worker即将被启动之前被调用。
 
 否则，调用Worker::runAll()方法，交由Workerman处理命令行参数。
 

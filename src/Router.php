@@ -19,8 +19,7 @@ class Router
     protected const _CONTROLLER = '/2';
     protected const _NAME = '/3';
     protected const _PARAMETER = '/4';
-    protected const _DELAY = '/5';
-    protected const _SIBLINGS = '/6';
+    protected const _SIBLINGS = '/5';
     protected const _404 = '/404';
     /**
      * 路由列表
@@ -47,6 +46,11 @@ class Router
      * @var null
      */
     protected $_pCall;
+    /**
+     * 中间件是否处于延时状态
+     * @var bool
+     */
+    protected $_delayed = false;
     /**
      * 生成器列表
      * @var array
@@ -151,7 +155,6 @@ class Router
             $this->_pSet[self::_CALLBACK] = $callback;
             $this->_pSet[self::_MIDDLEWARE] = [];
             $this->_pSet[self::_CONTROLLER] = [];
-            $this->_pSet[self::_DELAY] = false;
             $siblings[] = &$this->_pSet;
         }
         foreach ($siblings as &$sibling)
@@ -242,7 +245,7 @@ class Router
      * 添加生成器
      */
     private function _mPush() {
-        $this->_generators[] = self::_mCall($this->_pCall);
+        $this->_generators[] = $this->_mCall($this->_pCall);
     }
     /**
      * 将中间件回调封装到生成器中待调用
@@ -250,16 +253,18 @@ class Router
      * @param $pCall
      * @return \Generator
      */
-    private static function _mCall(&$pCall) {
+    private function _mCall(&$pCall) {
         if (!isset($pCall[self::_MIDDLEWARE]))
             return;
         foreach ($pCall[self::_MIDDLEWARE] as $callback) {
-            if ($pCall[self::_DELAY])
+            if ($this->_delayed) {
+                $this->_delayed = false;
                 yield;
-            $pCall[self::_DELAY] = false;
+            }
             if (!($callback() ?? true))
                 break;
         }
+        $this->_delayed = false;
         yield;
     }
     /**
@@ -283,7 +288,7 @@ class Router
      * 中间件延时
      */
     protected function delay() {
-        $this->_pCall[self::_DELAY] = true;
+        $this->_delayed = true;
     }
     /**
      * 路由别名，用于实现分发
@@ -313,14 +318,16 @@ class Router
      * @return mixed
      */
     protected function invoke($name = 0, $param = null) {
-        if (!isset($this->_pCall[self::_CONTROLLER][$name])) {
+        $controller = $this->_pCall[self::_CONTROLLER][$name] ?? Controller::$globals[$name] ?? null;
+        if (!isset($controller)) {
             Console::warning("Invalid controller binding \"$name\".");
             return false;
         }
-        $class = $this->_pCall[self::_CONTROLLER][$name][0];
-        $method = $this->_pCall[self::_CONTROLLER][$name][1];
+        $class = $controller[0];
+        $method = $controller[1];
         $object = new $class($this);
         $ret = $object->$method($param);
+        $this->mRet = $object->mRet;
         $this->retMsg = $object->retMsg;
         return $ret;
     }

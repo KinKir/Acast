@@ -90,13 +90,13 @@ abstract class Model {
     /**
      * MySQL UPDATE
      *
-     * @param $cols
+     * @param array $cols
      * @param mixed $where
      * @param array|null $bind
      * @param int|null $limit
      * @return mixed
      */
-    function update($cols, $where = null, ?array $bind = null, ?int $limit = null) {
+    function update(array $cols, $where = null, ?array $bind = null, ?int $limit = null) {
         $query = self::Db()->update($this->_table)->cols($cols);
         if (isset($where))
             $query->where($where);

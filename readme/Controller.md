@@ -16,6 +16,14 @@
 
 $name为类名（不包括命名空间）。
 
+### 全局的控制器绑定
+
+除了在路由中为特定的路由节点外，也可使用如下方法添加全局作用域的控制器绑定。
+
+> static function Controller::addGlobal(array $controllers) void
+
+$controllers的格式同Router::bind()，但是不可以省略别名。
+
 ### 成员变量
 
 1. $this-\>urlParams: 拷贝自路由实例。

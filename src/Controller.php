@@ -7,6 +7,11 @@ namespace Acast;
  */
 abstract class Controller {
     /**
+     * 全局控制器绑定
+     * @var array
+     */
+    public static $globals = [];
+    /**
      * 中间件返回信息
      * @var mixed
      */
@@ -39,9 +44,9 @@ abstract class Controller {
     /**
      * 构造函数，绑定模型、视图
      *
-     * @param Router $route
+     * @param Router $router
      */
-    function __construct(Router $route) {
+    function __construct(Router $router) {
         $temp = explode('\\', get_called_class());
         $name = Server::$name.'\\View\\'.end($temp);
         if (class_exists($name))
@@ -49,10 +54,10 @@ abstract class Controller {
         $name = Server::$name.'\\Model\\'.end($temp);
         if (class_exists($name))
             $this->model = new $name($this->view);
-        $this->method = $route->method;
-        $this->urlParams = $route->urlParams ?? [];
-        $this->retMsg = $route->retMsg ?? null;
-        $this->mRet = $route->mRet ?? null;
+        $this->method = $router->method;
+        $this->urlParams = $router->urlParams ?? [];
+        $this->retMsg = $router->retMsg ?? null;
+        $this->mRet = $router->mRet ?? null;
     }
     /**
      * 调用外部模型
@@ -67,5 +72,29 @@ abstract class Controller {
             return null;
         }
         return new $class($this->view);
+    }
+    /**
+     * 添加全局控制器绑定
+     *
+     * @param array $controllers
+     */
+    static function addGlobal(array $controllers) {
+        if (!is_array($controllers[0]))
+            $controllers = [$controllers];
+        foreach ($controllers as $controller) {
+            [$name, $controller, $method] = $controller;
+            if (isset(self::$globals[$name]))
+                Console::warning("Overwriting global controller \"$name\".");
+            $controller = Server::$name.'\\Controller\\'.$controller;
+            if (!class_exists($controller) || !is_subclass_of($controller, Controller::class)) {
+                Console::warning("Invalid controller \"$controller\".");
+                return;
+            }
+            if (!method_exists($controller, $method)) {
+                Console::warning("Invalid method \"$method\".");
+                return;
+            }
+            self::$globals[$name] = [$controller, $method];
+        }
     }
 }

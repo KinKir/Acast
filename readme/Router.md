@@ -34,6 +34,8 @@ Acast提供了当所有路由都无法匹配的时候自动匹配的路由。$pa
 
 4. $name为标识绑定的名称（用于invoke调用），$method为控制器的方法。
 
+5. 可以添加全局作用域的控制器绑定，见[控制器](Controller.md)一章。
+
 若一个路由绑定了控制器，则可以在回调函数中用以下方法调用。该类的构造函数会先被调用，然后是指定的方法。
 
 > function Router::invoke(string $name, $param = null) mixed 

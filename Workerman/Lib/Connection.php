@@ -1055,9 +1055,9 @@ class Connection
      * @param array $list
      * @return string
      */
-    protected function indentCsv(array $list)
+    protected function indentCsv(array $list, $desc = false)
     {
-        return ' ' . implode(',', $list);
+        return ' ' . implode(($desc ? ' DESC' : '').',', $list);
     }
 
     /**
@@ -1216,7 +1216,7 @@ class Connection
         if ($this->order_asc) {
             return ' ORDER BY' . $this->indentCsv($this->order_by) . ' ASC';
         } else {
-            return ' ORDER BY' . $this->indentCsv($this->order_by) . ' DESC';
+            return ' ORDER BY' . $this->indentCsv($this->order_by, true) . ' DESC';
         }
     }
 

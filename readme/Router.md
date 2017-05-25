@@ -94,7 +94,11 @@ Router::instance('demo')->add(['new'], 'GET', function () {
 
 5. $this-\>method: HTTP请求的方法。
 
-6. $this-\>rawRequest: 客户端发来的完整的请求内容。
+6. $this-\>remoteAddr: 客户端IP。
+
+7. $this-\>remotePort: 客户端端口。
+
+8. $this-\>rawRequest: 客户端发来的完整的请求内容。
 
 ### 示例
 

@@ -35,3 +35,9 @@ $controllers的格式同Router::bind()，但是不可以省略别名。
 4. $this-\>model: 绑定的模型示例。
 
 5. $this-\>view: 绑定的视图示例。
+
+6. $this-\>method: 拷贝自路由实例。
+
+7. $this-\>remoteAddr: 拷贝自路由实例。
+
+8. $this-\>remotePort: 拷贝自路由实例。

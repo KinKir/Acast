@@ -82,6 +82,16 @@ class Router
      */
     public $method;
     /**
+     * 客户端IP
+     * @var
+     */
+    public $remoteAddr;
+    /**
+     * 客户端端口
+     * @var
+     */
+    public $remotePort;
+    /**
      * 完整HTTP请求内容
      * @var string
      */
@@ -170,6 +180,8 @@ class Router
      */
     function locate(array $path, string $method) : bool {
         unset($this->urlParams, $this->retMsg, $this->mRet);
+        $this->remoteAddr = $this->connection->getRemoteIp();
+        $this->remotePort = $this->connection->getRemotePort();
         $this->method = $method;
         if (!isset($this->_tree[$method]))
             goto Err;

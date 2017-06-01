@@ -64,7 +64,7 @@ class Server {
      * Memcached实例
      * @var \Memcached
      */
-    static $memcache;
+    static $memcached;
     /**
      * 服务名（进程空间）
      * @var string
@@ -204,7 +204,7 @@ class Server {
      */
     function onServerStart(Worker $worker) {
         self::$name = $this->_name;
-        self::$memcache = new \Memcached();
+        self::$memcached = new \Memcached();
         pcntl_signal(SIGCHLD, SIG_IGN); //将子进程转交给内核，防止僵尸进程。
         if (is_callable($this->_on_start))
             call_user_func($this->_on_start, $worker);

@@ -42,16 +42,6 @@ abstract class Controller {
      */
     protected $method;
     /**
-     * 客户端地址
-     * @var
-     */
-    protected $remoteAddr;
-    /**
-     * 客户端端口
-     * @var
-     */
-    protected $remotePort;
-    /**
      * 构造函数，绑定模型、视图
      *
      * @param Router $router
@@ -66,8 +56,6 @@ abstract class Controller {
             $this->model = new $name($this->view);
         $this->method = $router->method;
         $this->urlParams = $router->urlParams ?? [];
-        $this->remoteAddr = $router->remoteAddr ?? null;
-        $this->remotePort = $router->remotePort ?? null;
         $this->retMsg = $router->retMsg ?? null;
         $this->mRet = $router->mRet ?? null;
     }

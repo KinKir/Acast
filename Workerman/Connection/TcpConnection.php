@@ -400,7 +400,7 @@ class TcpConnection extends ConnectionInterface
     {
         // SSL handshake.
         if ($this->transport === 'ssl' && $this->_sslHandshakeCompleted !== true) {
-            $ret = stream_socket_enable_crypto($socket, true, STREAM_CRYPTO_METHOD_SSLv2_SERVER |
+            $ret = @stream_socket_enable_crypto($socket, true, STREAM_CRYPTO_METHOD_SSLv2_SERVER |
                 STREAM_CRYPTO_METHOD_SSLv3_SERVER | STREAM_CRYPTO_METHOD_SSLv23_SERVER);
             // Negotiation has failed.
             if(false === $ret) {
@@ -430,7 +430,7 @@ class TcpConnection extends ConnectionInterface
             return;
         }
 
-        $buffer = fread($socket, self::READ_BUFFER_SIZE);
+        $buffer = @fread($socket, self::READ_BUFFER_SIZE);
 
         // Check connection closed.
         if ($buffer === '' || $buffer === false) {

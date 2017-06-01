@@ -39,7 +39,7 @@ abstract class Config {
      * @return bool
      */
     static function setGlobal(string $key, $value) {
-        return Server::$memcache->set('Acast_'.$key, $value);
+        return Server::$memcached->set('Acast_'.$key, $value);
     }
     /**
      * 批量设置全局配置项
@@ -55,6 +55,6 @@ abstract class Config {
      * @return mixed
      */
     static function getGlobal(string $key) {
-        return Server::$memcache->get('Acast_'.$key);
+        return Server::$memcached->get('Acast_'.$key);
     }
 }

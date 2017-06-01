@@ -44,7 +44,7 @@ abstract class View {
         }
         if ($use_memcache) {
             self::$_templates[$name] = false;
-            if (!Server::$memcache->set('mem_'.$name, $data))
+            if (!Server::$memcached->set('mem_'.$name, $data))
                 Console::warning("Failed to set memcached for view \"$name\".");
         } else
             self::$_templates[$name] = $data;
@@ -61,7 +61,7 @@ abstract class View {
             return $this;
         }
         if (self::$_templates[$name] === false)
-            $this->_temp = Server::$memcache->get('mem_'.$name);
+            $this->_temp = Server::$memcached->get('mem_'.$name);
         else
             $this->_temp = self::$_templates[$name];
         return $this;

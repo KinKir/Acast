@@ -8,6 +8,13 @@ if (version_compare($php_version, '7.1.0', '<')) {
     exit(1);
 }
 /**
+ * 检查PHP运行环境
+ */
+if (php_sapi_name() != 'cli') {
+    echo "Acast can only run in CLI mode.\n";
+    exit(11);
+}
+/**
  * 引用Acast配置文件
  */
 require_once __DIR__ . '/Config.php';

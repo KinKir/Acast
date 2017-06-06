@@ -97,14 +97,22 @@ class Server {
         $this->workerConfig(DEFAULT_WORKER_CONFIG);
     }
     /**
+     * 设置Worker静态成员变量
+     *
+     * @param array $config
+     */
+    static function workerStatic(array $config) {
+        foreach ($config as $key => $value)
+            Worker::$$key = $value;
+    }
+    /**
      * 配置Workerman
      *
      * @param array $config
      */
     function workerConfig(array $config) {
-        foreach ($config as $key => $value) {
+        foreach ($config as $key => $value)
             $this->_worker->$key = $value;
-        }
     }
     /**
      * 选择服务

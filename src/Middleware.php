@@ -7,14 +7,6 @@ namespace Acast;
  */
 abstract class Middleware {
     /**
-     * 输入过滤
-     */
-    const IN = 0;
-    /**
-     * 输出过滤
-     */
-    const OUT = 1;
-    /**
      * 存储中间件回调函数
      * @var array
      */

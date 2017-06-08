@@ -65,10 +65,6 @@ Server::app('Demo')->config([
 
 > function Server::getWorkerProperty(string $name) mixed
 
-Worker类的静态成员变量可以通过以下方法设置：
-
-> static function Server::workerStatic(array $config) void
-
 详细配置项见Workerman文档
 
 ### 启动服务

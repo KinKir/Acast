@@ -97,7 +97,6 @@ class Http
             'REQUEST_METHOD'       => '',
             'REQUEST_URI'          => '',
             'SERVER_PROTOCOL'      => '',
-            'SERVER_SOFTWARE'      => 'workerman/'.Worker::VERSION,
             'SERVER_NAME'          => '',
             'HTTP_HOST'            => '',
             'HTTP_USER_AGENT'      => '',
@@ -225,7 +224,7 @@ class Http
         }
 
         // header
-        $header .= "Server: workerman/" . Worker::VERSION . "\r\nContent-Length: " . strlen($content) . "\r\n\r\n";
+        $header .= "Content-Length: " . strlen($content) . "\r\n\r\n";
 
         // save session
         self::sessionWriteClose();
@@ -239,7 +238,7 @@ class Http
      *
      * @return bool|void
      */
-    public static function header($content, $replace = true, $http_response_code = 0)
+    public static function header($content, $http_response_code = 0)
     {
         if (strpos($content, 'HTTP') === 0) {
             $key = 'Http-Code';
@@ -251,7 +250,7 @@ class Http
         }
 
         if ('location' === strtolower($key) && !$http_response_code) {
-            return self::header($content, true, 302);
+            return self::header($content, 302);
         }
 
         if (isset(HttpCache::$codes[$http_response_code])) {
@@ -308,7 +307,7 @@ class Http
             . (empty($maxage) ? '' : '; Max-Age=' . $maxage)
             . (empty($path) ? '' : '; Path=' . $path)
             . (!$secure ? '' : '; Secure')
-            . (!$HTTPOnly ? '' : '; HttpOnly'), false);
+            . (!$HTTPOnly ? '' : '; HttpOnly'));
     }
 
     /**
@@ -559,4 +558,4 @@ class HttpCache
     }
 }
 
-HttpCache::init();
+//HttpCache::init();

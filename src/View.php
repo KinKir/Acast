@@ -74,7 +74,7 @@ abstract class View {
      * @return string|null
      */
     static function http(int $code, ?string $msg = null) {
-        Http::header('HTTP', true, $code);
+        Http::header('HTTP', $code);
         return $msg;
     }
     /**

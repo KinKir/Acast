@@ -12,3 +12,7 @@ const DEFAULT_WORKER_CONFIG = [
     'count' => 4,
     'name' => 'AcastHttpWorker',
 ];
+/**
+ * 是否为调试模式
+ */
+const DEBUG_MODE = false;

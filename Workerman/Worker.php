@@ -35,7 +35,7 @@ class Worker
      *
      * @var string
      */
-    const VERSION = '3.4.2';
+    const VERSION = '3.4.3';
 
     /**
      * Status starting.
@@ -1217,6 +1217,8 @@ class Worker
                 posix_kill($worker_pid, SIGINT);
                 Timer::add(self::KILL_WORKER_TIMER_TIME, 'posix_kill', array($worker_pid, SIGKILL), false);
             }
+            if (is_file(self::$_statisticsFile))
+                unlink(self::$_statisticsFile);
         } // For child processes.
         else {
             // Execute exit.
@@ -1553,9 +1555,11 @@ class Worker
                 call_user_func($this->onWorkerStart, $this);
             } catch (\Exception $e) {
                 self::log($e);
+                sleep(1);
                 exit(250);
             } catch (\Error $e) {
                 self::log($e);
+                sleep(1);
                 exit(250);
             }
         }

@@ -349,9 +349,8 @@ class Http
         // Read session from session file.
         if (HttpCache::$instance->sessionFile) {
             $raw = file_get_contents(HttpCache::$instance->sessionFile);
-            if ($raw) {
-                session_decode($raw);
-            }
+            if ($raw)
+                $_SESSION = unserialize($raw);
         }
         return true;
     }
@@ -364,7 +363,7 @@ class Http
     public static function sessionWriteClose()
     {
         if (!empty(HttpCache::$instance->sessionStarted) && !empty($_SESSION)) {
-            $session_str = session_encode();
+            $session_str = serialize($_SESSION);
             if ($session_str && HttpCache::$instance->sessionFile) {
                 return file_put_contents(HttpCache::$instance->sessionFile, $session_str);
             }

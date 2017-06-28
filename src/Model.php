@@ -26,19 +26,6 @@ abstract class Model {
      */
     protected static $_connection;
     /**
-     * 控制器绑定的视图实例
-     * @var View|null
-     */
-    protected $_view;
-    /**
-     * 构造函数
-     * @param View|null $view
-     */
-    function __construct(?View $view = null) {
-        if ($view)
-            $this->_view = $view;
-    }
-    /**
      * 配置数据库连接
      *
      * @param array $config
@@ -59,10 +46,10 @@ abstract class Model {
      * @param string $return
      * @return mixed
      */
-    function select($cols, $where = null,
-                    ?array $bind = null,
-                    ?array $order_by = null,
-                    ?array $limit = null, string $return = self::ALL) {
+     protected function _select($cols, $where = null,
+                                ?array $bind = null,
+                                ?array $order_by = null,
+                                ?array $limit = null, string $return = self::ALL) {
         $query = self::Db()->select($cols)->from($this->_table);
         if (isset($where))
             $query->where($where);
@@ -81,7 +68,7 @@ abstract class Model {
      * @param array|null $bind
      * @return mixed
      */
-    function insert(array $cols, ?array $bind = null) {
+    protected function _insert(array $cols, ?array $bind = null) {
         $query = self::Db()->insert($this->_table)->cols($cols);
         if (isset($bind))
             $query->bindValues($bind);
@@ -96,7 +83,7 @@ abstract class Model {
      * @param int|null $limit
      * @return mixed
      */
-    function update(array $cols, $where = null, ?array $bind = null, ?int $limit = null) {
+    protected function _update(array $cols, $where = null, ?array $bind = null, ?int $limit = null) {
         $query = self::Db()->update($this->_table)->cols($cols);
         if (isset($where))
             $query->where($where);
@@ -114,7 +101,7 @@ abstract class Model {
      * @param int|null $limit
      * @return mixed
      */
-    function delete($where = null, ?array $bind = null, ?int $limit = null) {
+    protected function _delete($where = null, ?array $bind = null, ?int $limit = null) {
         $query = self::Db()->delete($this->_table);
         if (isset($where))
             $query->where($where);

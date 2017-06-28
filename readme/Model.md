@@ -12,9 +12,9 @@
 
 > static function Model::config(array $config) void
 
-$config为MySQL配置数据，格式为\[$host, $port, $user, $password, $db_name\]。
+$config为MySQL配置数据，格式为\[$host, $port, $user, $password, $db_name, $charset\]。
 
-一般，数据库配置和初始化工作在在start回调中进行。
+一般，数据库配置和初始化工作在start回调中进行。
 
 ### 操作数据库
 
@@ -26,18 +26,14 @@ $config为MySQL配置数据，格式为\[$host, $port, $user, $password, $db_nam
 
 Acast\\Model提供了一些便捷的方法，方便进行一些基本的CURD操作。
 
-> function Model::select($cols, $where = null, ?array $bind = null, ?array $order_by = null, ?array $limit = null) mixed
+> protected function Model::_select($cols, $where = null, ?array $bind = null, ?array $order_by = null, ?array $limit = null) mixed
 
-> function Model::insert(array $cols, ?array $bind = null) mixed
+> protected function Model::_insert(array $cols, ?array $bind = null) mixed
 
-> function Model::update($cols, $where = null, ?array $bind = null, ?int $limit = null) mixed
+> protected function Model::_update($cols, $where = null, ?array $bind = null, ?int $limit = null) mixed
 
-> function Model::delete($where = null, ?array $bind = null, ?int $limit = null) mixed
+> protected function Model::_delete($where = null, ?array $bind = null, ?int $limit = null) mixed
 
-以上操作需要通过View::table()方法绑定数据表。一般来说，一个控制器不止操作一个数据表，因此，这个方法不是十分实用。
+以上操作需要通过Model::table\(\)方法绑定数据表。一般来说，一个控制器不止操作一个数据表，因此，这个方法不是十分实用。
 
 由于数据库连接的实例是静态成员，因此，可以将某些可能被多个控制器调用的方法定义为静态方法，方便被其他模型调用。
-
-### 其他
-
-如果对应的控制器也绑定了视图，则可以通过$this-\>_view调用其方法。

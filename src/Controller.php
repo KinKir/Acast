@@ -53,7 +53,7 @@ abstract class Controller {
             $this->view = new $name($this);
         $name = Server::$name.'\\Model\\'.end($temp);
         if (class_exists($name))
-            $this->model = new $name($this->view);
+            $this->model = new $name;
         $this->method = $router->method;
         $this->urlParams = $router->urlParams ?? [];
         $this->retMsg = $router->retMsg ?? null;

@@ -8,9 +8,9 @@ namespace Acast;
 class Migrate {
     /**
      * 实例列表
-     * @var self
+     * @var array
      */
-    protected static $_instances;
+    protected static $_instances = [];
     /**
      * PDO对象
      * @var \PDO
@@ -29,10 +29,8 @@ class Migrate {
      * @param string $sql_path
      */
     static function create(string $name, array $settings, string $sql_path) {
-        if (isset(self::$_instances[$name])) {
+        if (isset(self::$_instances[$name]))
             Console::warning("Overwriting migration \"$name\".");
-            return;
-        }
         self::$_instances[$name] = new self($settings, $sql_path);
     }
     /**

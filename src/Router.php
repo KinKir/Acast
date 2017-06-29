@@ -99,7 +99,7 @@ class Router
             eval('namespace Acast; class RouterWrapper extends Router{}');
         if (isset(self::$routers[$name]))
             Console::fatal("Router \"$name\" already exists.");
-        self::$routers[$name] = new self();
+        self::$routers[$name] = new self;
     }
     /**
      * 获取路由实例

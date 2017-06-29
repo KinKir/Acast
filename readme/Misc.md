@@ -4,7 +4,7 @@
 
 ### 控制台I/O
 
-由于Acast是基于PHP-CLI的，因此调试时难免会有控制台输出。Acast\\Console封装了一些控制台I/O的方法，参见src/Console.php。
+由于`Acast`是基于PHP-CLI的，因此调试时难免会有控制台输出。`Acast\Console`封装了一些控制台I/O的方法，参见`src/Console.php`。
 
 Acast还提供了控制台函数的注册接口，如下：
 

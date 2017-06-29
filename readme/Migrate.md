@@ -8,9 +8,9 @@
 
 新建一个Migrate实例。
 
-1. \$name为实例名称。
-2. \$settings为连接配置（格式与Model相同，但不指定dbname）。
-3. \$sql_path为待执行的SQL文件的路径。
+1. `$name`为实例名称。
+2. `$settings`为连接配置（格式与`Model`相同，但不指定`dbname`）。
+3. `$sql_path`为待执行的SQL文件的路径。
 
 ### 获取Migrate实例
 
@@ -20,6 +20,6 @@
 
 > function Migrate::execute(array $replace) void
 
-其中，\$replace为key-value型数组。key为待替换的字段名，value为替换后的字符串。替换后，SQL文件中的语句将被执行。
+其中，`$replace`为key-value型数组。key为待替换的字段名，value为替换后的字符串。替换后，SQL文件中的语句将被执行。
 
 在SQL文件中，key的格式为“%:=key=:%”。

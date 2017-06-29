@@ -1,4 +1,4 @@
-## 计划任务(Acast\\)
+## 计划任务(Acast\\Cron)
 
 [返回主页](../Readme.md)
 
@@ -6,7 +6,7 @@
 
 > static function Cron::create(string $name, int $interval) void
 
-在当前进程创建一个计划任务服务。$name为服务名称，$interval为计划任务的执行间隔。
+在当前进程创建一个计划任务服务。`$name`为服务名称，`$interval`为计划任务的执行间隔。
 
 > static function Cron::destroy(string $name) void
 
@@ -30,15 +30,15 @@
 
 > function Cron::add(string $name, int $when, callable $callback, $param = null, bool $persistent) void
 
-1. $name为计划任务名称
+1. `$name`为计划任务名称
 
-2. $when为时间戳，当计划任务服务执行时，若该时间戳不迟于当前时间，则对应计划任务的回调函数将被调用
+2. `$when`为时间戳，当计划任务服务执行时，若该时间戳不迟于当前时间，则对应计划任务的回调函数将被调用
 
-3. $callback为回调函数，在下一节中会对函数格式作出说明。
+3. `$callback`为回调函数，在下一节中会对函数格式作出说明。
 
-4. $param为传递给回调函数的额外参数。
+4. `$param`为传递给回调函数的额外参数。
 
-5. $persistent为计划任务的持久性，若为false，则其回调函数执行完毕后，该任务会被移除。
+5. `$persistent`为计划任务的持久性，若为`false`，则其回调函数执行完毕后，该任务会被移除。
 
 注意：避免在用于网络IO的进程中添加高耗时的计划任务，否则会导致阻塞。
 

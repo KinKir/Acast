@@ -4,7 +4,7 @@
 
 ### 规则
 
-用户自定义的控制器应该继承Acast\\Controller，命名空间应为$app\\Controller。
+用户自定义的控制器应该继承`Acast\Controller`，命名空间应为`$app\Controller`。
 
 如果存在类型及命名空间正确且与之名称相同的控制器或视图类，则它们会自动被加载。
 
@@ -12,9 +12,9 @@
 
 > protected function Controller::invoke(string $name) Model|null
 
-有时，我们可能需要调用非与本控制器绑定的模型中的方法。invoke方法会返回指定模型的一个实例。
+有时，我们可能需要调用非与本控制器绑定的模型中的方法。`invoke()`方法会返回指定模型的一个实例。
 
-$name为类名（不包括命名空间）。
+`$name`为类名（不包括命名空间）。
 
 ### 全局的控制器绑定
 
@@ -22,18 +22,18 @@ $name为类名（不包括命名空间）。
 
 > static function Controller::addGlobal(array $controllers) void
 
-$controllers的格式同Router::bind()，但是不可以省略别名。
+$controllers的格式同`Router::bind()`，但是不可以省略别名。
 
 ### 成员变量
 
-1. $this-\>urlParams: 拷贝自路由实例。
+1. `$this->urlParams`: 拷贝自路由实例。
 
-2. $this-\>mRet: 拷贝自路由实例。
+2. `$this->mRet`: 拷贝自路由实例。
 
-3. $this-\>retMsg: 拷贝自路由实例，调用结束后拷贝回路由。
+3. `$this->retMsg`: 拷贝自路由实例，调用结束后拷贝回路由。
 
-4. $this-\>model: 绑定的模型示例。
+4. `$this->model`: 绑定的模型示例。
 
-5. $this-\>view: 绑定的视图示例。
+5. `$this->view`: 绑定的视图示例。
 
-6. $this-\>method: 拷贝自路由实例。
+6. `$this->method`: 拷贝自路由实例。

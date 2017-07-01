@@ -11,8 +11,6 @@
  * @link      http://www.workerman.net/
  * @license   http://www.opensource.org/licenses/mit-license.php MIT License
  */
-
-// Date.timezone
 if (!ini_get('date.timezone')) {
     date_default_timezone_set('Asia/Shanghai');
 }

@@ -24,14 +24,14 @@ class Ev implements EventInterface
      *
      * @var array
      */
-    protected $_allEvents = array();
+    protected $_allEvents = [];
 
     /**
      * Event listeners of signal.
      *
      * @var array
      */
-    protected $_eventSignal = array();
+    protected $_eventSignal = [];
 
     /**
      * All timer event listeners.
@@ -39,7 +39,7 @@ class Ev implements EventInterface
      *
      * @var array
      */
-    protected $_eventTimer = array();
+    protected $_eventTimer = [];
 
     /**
      * Timer id.
@@ -73,8 +73,8 @@ class Ev implements EventInterface
             case self::EV_TIMER:
             case self::EV_TIMER_ONCE:
                 $repeat                             = $flag == self::EV_TIMER_ONCE ? 0 : $fd;
-                $param                              = array($func, (array)$args, $flag, $fd, self::$_timerId);
-                $event                              = new \EvTimer($fd, $repeat, array($this, 'timerCallback'), $param);
+                $param                              = [$func, (array)$args, $flag, $fd, self::$_timerId];
+                $event                              = new \EvTimer($fd, $repeat, [$this, 'timerCallback'], $param);
                 $this->_eventTimer[self::$_timerId] = $event;
                 return self::$_timerId++;
             default :
@@ -157,7 +157,7 @@ class Ev implements EventInterface
         foreach ($this->_eventTimer as $event) {
             $event->stop();
         }
-        $this->_eventTimer = array();
+        $this->_eventTimer = [];
     }
 
     /**

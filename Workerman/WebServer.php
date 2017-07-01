@@ -14,7 +14,6 @@
 namespace Workerman;
 
 use Workerman\Protocols\Http;
-use Workerman\Protocols\HttpCache;
 
 /**
  *  WebServer.
@@ -26,14 +25,14 @@ class WebServer extends Worker
      *
      * @var array ['workerman.net'=>'/home', 'www.workerman.net'=>'home/www']
      */
-    protected $serverRoot = array();
+    protected $serverRoot = [];
 
     /**
      * Mime mapping.
      *
      * @var array
      */
-    protected static $mimeTypeMap = array();
+    protected static $mimeTypeMap = [];
 
 
     /**
@@ -61,9 +60,9 @@ class WebServer extends Worker
      * @param string $socket_name
      * @param array  $context_option
      */
-    public function __construct($socket_name, $context_option = array())
+    public function __construct($socket_name, $context_option = [])
     {
-        list(, $address) = explode(':', $socket_name, 2);
+        $address = explode(':', $socket_name, 2)[1];
         parent::__construct('http:' . $address, $context_option);
         $this->name = 'WebServer';
     }
@@ -76,8 +75,8 @@ class WebServer extends Worker
     public function run()
     {
         $this->_onWorkerStart = $this->onWorkerStart;
-        $this->onWorkerStart  = array($this, 'onWorkerStart');
-        $this->onMessage      = array($this, 'onMessage');
+        $this->onWorkerStart  = [$this, 'onWorkerStart'];
+        $this->onMessage      = [$this, 'onMessage'];
         parent::run();
     }
 

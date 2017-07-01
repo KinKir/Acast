@@ -34,7 +34,7 @@ class Timer
      *
      * @var array
      */
-    protected static $_tasks = array();
+    protected static $_tasks = [];
 
     /**
      * event
@@ -54,7 +54,7 @@ class Timer
         if ($event) {
             self::$_event = $event;
         } else {
-            pcntl_signal(SIGALRM, array('\Workerman\Lib\Timer', 'signalHandle'), false);
+            pcntl_signal(SIGALRM, ['\Workerman\Lib\Timer', 'signalHandle'], false);
         }
     }
 
@@ -80,10 +80,10 @@ class Timer
      * @param bool     $persistent
      * @return int/false
      */
-    public static function add($time_interval, $func, $args = array(), $persistent = true)
+    public static function add($time_interval, $func, $args = [], $persistent = true)
     {
         if ($time_interval <= 0) {
-            echo new Exception("bad time_interval");
+            echo new Exception('bad time_interval');
             return false;
         }
 
@@ -93,7 +93,7 @@ class Timer
         }
 
         if (!is_callable($func)) {
-            echo new Exception("not callable");
+            echo new Exception('not callable');
             return false;
         }
 
@@ -104,9 +104,9 @@ class Timer
         $time_now = time();
         $run_time = $time_now + $time_interval;
         if (!isset(self::$_tasks[$run_time])) {
-            self::$_tasks[$run_time] = array();
+            self::$_tasks[$run_time] = [];
         }
-        self::$_tasks[$run_time][] = array($func, (array)$args, $persistent, $time_interval);
+        self::$_tasks[$run_time][] = [$func, (array)$args, $persistent, $time_interval];
         return 1;
     }
 
@@ -167,7 +167,7 @@ class Timer
      */
     public static function delAll()
     {
-        self::$_tasks = array();
+        self::$_tasks = [];
         pcntl_alarm(0);
         if (self::$_event) {
             self::$_event->clearAllTimer();

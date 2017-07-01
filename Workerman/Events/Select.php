@@ -23,28 +23,28 @@ class Select implements EventInterface
      *
      * @var array
      */
-    public $_allEvents = array();
+    public $_allEvents = [];
 
     /**
      * Event listeners of signal.
      *
      * @var array
      */
-    public $_signalEvents = array();
+    public $_signalEvents = [];
 
     /**
      * Fds waiting for read event.
      *
      * @var array
      */
-    protected $_readFds = array();
+    protected $_readFds = [];
 
     /**
      * Fds waiting for write event.
      *
      * @var array
      */
-    protected $_writeFds = array();
+    protected $_writeFds = [];
 
     /**
      * Timer scheduler.
@@ -60,7 +60,7 @@ class Select implements EventInterface
      *
      * @var array
      */
-    protected $_task = array();
+    protected $_task = [];
 
     /**
      * Timer id.
@@ -81,7 +81,7 @@ class Select implements EventInterface
      *
      * @var array
      */
-    protected $channel = array();
+    protected $channel = [];
 
     /**
      * Construct.
@@ -102,29 +102,29 @@ class Select implements EventInterface
     /**
      * {@inheritdoc}
      */
-    public function add($fd, $flag, $func, $args = array())
+    public function add($fd, $flag, $func, $args = [])
     {
         switch ($flag) {
             case self::EV_READ:
                 $fd_key                           = (int)$fd;
-                $this->_allEvents[$fd_key][$flag] = array($func, $fd);
+                $this->_allEvents[$fd_key][$flag] = [$func, $fd];
                 $this->_readFds[$fd_key]          = $fd;
                 break;
             case self::EV_WRITE:
                 $fd_key                           = (int)$fd;
-                $this->_allEvents[$fd_key][$flag] = array($func, $fd);
+                $this->_allEvents[$fd_key][$flag] = [$func, $fd];
                 $this->_writeFds[$fd_key]         = $fd;
                 break;
             case self::EV_SIGNAL:
                 $fd_key                              = (int)$fd;
-                $this->_signalEvents[$fd_key][$flag] = array($func, $fd);
-                pcntl_signal($fd, array($this, 'signalHandler'));
+                $this->_signalEvents[$fd_key][$flag] = [$func, $fd];
+                pcntl_signal($fd, [$this, 'signalHandler']);
                 break;
             case self::EV_TIMER:
             case self::EV_TIMER_ONCE:
                 $run_time = microtime(true) + $fd;
                 $this->_scheduler->insert($this->_timerId, -$run_time);
-                $this->_task[$this->_timerId] = array($func, (array)$args, $flag, $fd);
+                $this->_task[$this->_timerId] = [$func, (array)$args, $flag, $fd];
                 $this->tick();
                 return $this->_timerId++;
         }
@@ -217,7 +217,7 @@ class Select implements EventInterface
     {
         $this->_scheduler = new \SplPriorityQueue();
         $this->_scheduler->setExtractFlags(\SplPriorityQueue::EXTR_BOTH);
-        $this->_task = array();
+        $this->_task = [];
     }
 
     /**
@@ -247,7 +247,7 @@ class Select implements EventInterface
                 $fd_key = (int)$fd;
                 if (isset($this->_allEvents[$fd_key][self::EV_READ])) {
                     call_user_func_array($this->_allEvents[$fd_key][self::EV_READ][0],
-                        array($this->_allEvents[$fd_key][self::EV_READ][1]));
+                        [$this->_allEvents[$fd_key][self::EV_READ][1]]);
                 }
             }
 
@@ -255,7 +255,7 @@ class Select implements EventInterface
                 $fd_key = (int)$fd;
                 if (isset($this->_allEvents[$fd_key][self::EV_WRITE])) {
                     call_user_func_array($this->_allEvents[$fd_key][self::EV_WRITE][0],
-                        array($this->_allEvents[$fd_key][self::EV_WRITE][1]));
+                        [$this->_allEvents[$fd_key][self::EV_WRITE][1]]);
                 }
             }
         }

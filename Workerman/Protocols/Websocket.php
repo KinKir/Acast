@@ -396,7 +396,7 @@ class Websocket implements \Workerman\Protocols\ProtocolInterface
                 if (!empty($_SESSION) && class_exists('\GatewayWorker\Lib\Context')) {
                     $connection->session = \GatewayWorker\Lib\Context::sessionEncode($_SESSION);
                 }
-                $_GET = $_SERVER = $_SESSION = $_COOKIE = array();
+                $_GET = $_SERVER = $_SESSION = $_COOKIE = [];
             }
             if (strlen($buffer) > $header_length) {
                 return static::input(substr($buffer, $header_length), $connection);
@@ -425,14 +425,14 @@ class Websocket implements \Workerman\Protocols\ProtocolInterface
     protected static function parseHttpHeader($buffer)
     {
         // Parse headers.
-        list($http_header, ) = explode("\r\n\r\n", $buffer, 2);
+        $http_header = explode("\r\n\r\n", $buffer, 2)[0];
         $header_data = explode("\r\n", $http_header);
 
         if ($_SERVER) {
-            $_SERVER = array();
+            $_SERVER = [];
         }
 
-        list($_SERVER['REQUEST_METHOD'], $_SERVER['REQUEST_URI'], $_SERVER['SERVER_PROTOCOL']) = explode(' ',
+        [$_SERVER['REQUEST_METHOD'], $_SERVER['REQUEST_URI'], $_SERVER['SERVER_PROTOCOL']] = explode(' ',
             $header_data[0]);
 
         unset($header_data[0]);
@@ -441,7 +441,7 @@ class Websocket implements \Workerman\Protocols\ProtocolInterface
             if (empty($content)) {
                 continue;
             }
-            list($key, $value)       = explode(':', $content, 2);
+            [$key, $value]           = explode(':', $content, 2);
             $key                     = str_replace('-', '_', strtoupper($key));
             $value                   = trim($value);
             $_SERVER['HTTP_' . $key] = $value;

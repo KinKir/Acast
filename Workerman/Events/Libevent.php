@@ -32,14 +32,14 @@ class Libevent implements EventInterface
      *
      * @var array
      */
-    protected $_allEvents = array();
+    protected $_allEvents = [];
 
     /**
      * Event listeners of signal.
      *
      * @var array
      */
-    protected $_eventSignal = array();
+    protected $_eventSignal = [];
 
     /**
      * All timer event listeners.
@@ -47,7 +47,7 @@ class Libevent implements EventInterface
      *
      * @var array
      */
-    protected $_eventTimer = array();
+    protected $_eventTimer = [];
 
     /**
      * construct
@@ -60,7 +60,7 @@ class Libevent implements EventInterface
     /**
      * {@inheritdoc}
      */
-    public function add($fd, $flag, $func, $args = array())
+    public function add($fd, $flag, $func, $args = [])
     {
         switch ($flag) {
             case self::EV_SIGNAL:
@@ -81,7 +81,7 @@ class Libevent implements EventInterface
             case self::EV_TIMER_ONCE:
                 $event    = event_new();
                 $timer_id = (int)$event;
-                if (!event_set($event, 0, EV_TIMEOUT, array($this, 'timerCallback'), $timer_id)) {
+                if (!event_set($event, 0, EV_TIMEOUT, [$this, 'timerCallback'], $timer_id)) {
                     return false;
                 }
 
@@ -93,7 +93,7 @@ class Libevent implements EventInterface
                 if (!event_add($event, $time_interval)) {
                     return false;
                 }
-                $this->_eventTimer[$timer_id] = array($func, (array)$args, $event, $flag, $time_interval);
+                $this->_eventTimer[$timer_id] = [$func, (array)$args, $event, $flag, $time_interval];
                 return $timer_id;
 
             default :
@@ -191,7 +191,7 @@ class Libevent implements EventInterface
         foreach ($this->_eventTimer as $task_data) {
             event_del($task_data[2]);
         }
-        $this->_eventTimer = array();
+        $this->_eventTimer = [];
     }
 
     /**

@@ -14,7 +14,6 @@
 namespace Workerman\Protocols;
 
 use Workerman\Connection\TcpConnection;
-use Workerman\Worker;
 
 /**
  * http protocol
@@ -25,7 +24,7 @@ class Http
      * The supported HTTP methods
      * @var array
      */
-    public static $methods = array('GET', 'POST', 'PUT', 'DELETE', 'HEAD', 'OPTIONS');
+    public static $methods = ['GET', 'POST', 'PUT', 'DELETE', 'HEAD', 'OPTIONS'];
 
     /**
      * Check the integrity of the package.
@@ -45,12 +44,12 @@ class Http
             return 0;
         }
 
-        list($header,) = explode("\r\n\r\n", $recv_buffer, 2);
+        $header = explode("\r\n\r\n", $recv_buffer, 2)[0];
         $method = substr($header, 0, strpos($header, ' '));
 
-        if(in_array($method, static::$methods)) {
+        if (in_array($method, static::$methods)) {
             return static::getRequestSize($header, $method);
-        }else{
+        } else {
             $connection->send("HTTP/1.1 400 Bad Request\r\n\r\n", true);
             return 0;
         }
@@ -65,10 +64,9 @@ class Http
      */
     protected static function getRequestSize($header, $method)
     {
-        if ($method == 'GET' || $method == 'OPTIONS' || $method == 'HEAD' || $method == 'DELETE') {
+        if ($method == 'GET' || $method == 'OPTIONS' || $method == 'HEAD' || $method == 'DELETE')
             return strlen($header) + 4;
-        }
-        $match = array();
+        $match = [];
         if (preg_match("/\r\nContent-Length: ?(\d+)/i", $header, $match)) {
             $content_length = isset($match[1]) ? $match[1] : 0;
             return $content_length + strlen($header) + 4;
@@ -86,13 +84,13 @@ class Http
     public static function decode($recv_buffer, TcpConnection $connection)
     {
         // Init.
-        $_POST                         = $_GET = $_COOKIE = $_REQUEST = $_SESSION = $_FILES = array();
+        $_POST = $_GET = $_COOKIE = $_REQUEST = $_SESSION = $_FILES = [];
         $GLOBALS['HTTP_RAW_POST_DATA'] = '';
         // Clear cache.
-        HttpCache::$header   = array('Connection' => 'Connection: keep-alive');
+        HttpCache::$header   = ['Connection' => 'Connection: keep-alive'];
         HttpCache::$instance = new HttpCache();
         // $_SERVER
-        $_SERVER = array(
+        $_SERVER = [
             'QUERY_STRING'         => '',
             'REQUEST_METHOD'       => '',
             'REQUEST_URI'          => '',
@@ -108,13 +106,13 @@ class Http
             'REMOTE_ADDR'          => '',
             'REMOTE_PORT'          => '0',
             'REQUEST_TIME'         => time()
-        );
+        ];
 
         // Parse headers.
-        list($http_header, $http_body) = explode("\r\n\r\n", $recv_buffer, 2);
+        [$http_header, $http_body] = explode("\r\n\r\n", $recv_buffer, 2);
         $header_data = explode("\r\n", $http_header);
 
-        list($_SERVER['REQUEST_METHOD'], $_SERVER['REQUEST_URI'], $_SERVER['SERVER_PROTOCOL']) = explode(' ',
+        [$_SERVER['REQUEST_METHOD'], $_SERVER['REQUEST_URI'], $_SERVER['SERVER_PROTOCOL']] = explode(' ',
             $header_data[0]);
 
         $http_post_boundary = '';
@@ -124,7 +122,7 @@ class Http
             if (empty($content)) {
                 continue;
             }
-            list($key, $value)       = explode(':', $content, 2);
+            [$key, $value]           = explode(':', $content, 2);
             $key                     = str_replace('-', '_', strtoupper($key));
             $value                   = trim($value);
             $_SERVER['HTTP_' . $key] = $value;
@@ -157,9 +155,7 @@ class Http
         }
 
         // Parse $_POST.
-        if ($_SERVER['REQUEST_METHOD'] === 'POST' ||
-            $_SERVER['REQUEST_METHOD'] === 'PUT' ||
-            $_SERVER['REQUEST_METHOD'] === 'DELETE') {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST' || $_SERVER['REQUEST_METHOD'] === 'PUT') {
             if (isset($_SERVER['CONTENT_TYPE'])) {
                 if ($_SERVER['CONTENT_TYPE'] === 'multipart/form-data')
                     self::parseUploadFiles($http_body, $http_post_boundary);
@@ -180,9 +176,6 @@ class Http
             $_SERVER['QUERY_STRING'] = '';
         }
 
-        // REQUEST
-        $_REQUEST = array_merge($_GET, $_POST);
-
         // REMOTE_ADDR REMOTE_PORT
         $_SERVER['REMOTE_ADDR'] = $connection->getRemoteIp();
         $_SERVER['REMOTE_PORT'] = $connection->getRemotePort();
@@ -194,10 +187,9 @@ class Http
      * Http encode.
      *
      * @param string        $content
-     * @param TcpConnection $connection
      * @return string
      */
-    public static function encode($content, TcpConnection $connection)
+    public static function encode($content)
     {
         // Default http-code.
         if (!isset(HttpCache::$header['Http-Code'])) {
@@ -227,7 +219,7 @@ class Http
         $header .= "Content-Length: " . strlen($content) . "\r\n\r\n";
 
         // save session
-        self::sessionWriteClose();
+        //self::sessionWriteClose();
 
         // the whole http package
         return $header . $content;
@@ -410,12 +402,12 @@ class Http
             unset($boundary_data_array[0]);
         }
         foreach ($boundary_data_array as $boundary_data_buffer) {
-            list($boundary_header_buffer, $boundary_value) = explode("\r\n\r\n", $boundary_data_buffer, 2);
+            [$boundary_header_buffer, $boundary_value] = explode("\r\n\r\n", $boundary_data_buffer, 2);
             // Remove \r\n from the end of buffer.
             $boundary_value = substr($boundary_value, 0, -2);
             $key = -1;
             foreach (explode("\r\n", $boundary_header_buffer) as $item) {
-                list($header_key, $header_value) = explode(": ", $item);
+                [$header_key, $header_value] = explode(": ", $item);
                 $header_key = strtolower($header_key);
                 switch ($header_key) {
                     case "content-disposition":
@@ -423,12 +415,12 @@ class Http
                         // Is file data.
                         if (preg_match('/name="(.*?)"; filename="(.*?)"$/', $header_value, $match)) {
                             // Parse $_FILES.
-                            $_FILES[$key] = array(
+                            $_FILES[$key] = [
                                 'name' => $match[1],
                                 'file_name' => $match[2],
                                 'file_data' => $boundary_value,
                                 'file_size' => strlen($boundary_value),
-                            );
+                            ];
                             continue;
                         } // Is post field.
                         else {
@@ -474,7 +466,7 @@ class Http
  */
 class HttpCache
 {
-    public static $codes = array(
+    public static $codes = [
         100 => 'Continue',
         101 => 'Switching Protocols',
         200 => 'OK',
@@ -518,13 +510,13 @@ class HttpCache
         503 => 'Service Unavailable',
         504 => 'Gateway Timeout',
         505 => 'HTTP Version Not Supported',
-    );
+    ];
 
     /**
      * @var HttpCache
      */
     public static $instance             = null;
-    public static $header               = array();
+    public static $header               = [];
     public static $sessionPath          = '';
     public static $sessionName          = '';
     public static $sessionGcProbability = 1;

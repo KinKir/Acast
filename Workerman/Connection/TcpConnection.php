@@ -15,7 +15,6 @@ namespace Workerman\Connection;
 
 use Workerman\Events\EventInterface;
 use Workerman\Worker;
-use Exception;
 
 /**
  * TcpConnection.
@@ -238,11 +237,8 @@ class TcpConnection extends ConnectionInterface
         $this->id      = $this->_id = self::$_idRecorder++;
         $this->_socket = $socket;
         stream_set_blocking($this->_socket, 0);
-        // Compatible with hhvm
-        if (function_exists('stream_set_read_buffer')) {
-            stream_set_read_buffer($this->_socket, 0);
-        }
-        Worker::$globalEvent->add($this->_socket, EventInterface::EV_READ, array($this, 'baseRead'));
+        stream_set_read_buffer($this->_socket, 0);
+        Worker::$globalEvent->add($this->_socket, EventInterface::EV_READ, [$this, 'baseRead']);
         $this->maxSendBufferSize = self::$defaultMaxSendBufferSize;
         $this->_remoteAddress    = $remote_address;
     }
@@ -321,7 +317,7 @@ class TcpConnection extends ConnectionInterface
                 }
                 $this->_sendBuffer = $send_buffer;
             }
-            Worker::$globalEvent->add($this->_socket, EventInterface::EV_WRITE, array($this, 'baseWrite'));
+            Worker::$globalEvent->add($this->_socket, EventInterface::EV_WRITE, [$this, 'baseWrite']);
             // Check if the send buffer will be full.
             $this->checkBufferWillFull();
             return null;
@@ -383,7 +379,7 @@ class TcpConnection extends ConnectionInterface
     public function resumeRecv()
     {
         if ($this->_isPaused === true) {
-            Worker::$globalEvent->add($this->_socket, EventInterface::EV_READ, array($this, 'baseRead'));
+            Worker::$globalEvent->add($this->_socket, EventInterface::EV_READ, [$this, 'baseRead']);
             $this->_isPaused = false;
             $this->baseRead($this->_socket, false);
         }
@@ -425,7 +421,7 @@ class TcpConnection extends ConnectionInterface
             }
             $this->_sslHandshakeCompleted = true;
             if ($this->_sendBuffer) {
-                Worker::$globalEvent->add($socket, EventInterface::EV_WRITE, array($this, 'baseWrite'));
+                Worker::$globalEvent->add($socket, EventInterface::EV_WRITE, [$this, 'baseWrite']);
             }
             return;
         }

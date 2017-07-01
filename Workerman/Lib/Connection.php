@@ -16,7 +16,7 @@ class Connection
      *
      * @var array
      */
-    protected $union = array();
+    protected $union = [];
 
     /**
      * 是否是更新
@@ -30,14 +30,14 @@ class Connection
      *
      * @var array
      */
-    protected $cols = array();
+    protected $cols = [];
 
     /**
      * 从哪些表里面 SELECT
      *
      * @var array
      */
-    protected $from = array();
+    protected $from = [];
 
     /**
      * $from 当前的 key
@@ -51,21 +51,21 @@ class Connection
      *
      * @var array
      */
-    protected $group_by = array();
+    protected $group_by = [];
 
     /**
      * HAVING 条件数组.
      *
      * @var array
      */
-    protected $having = array();
+    protected $having = [];
 
     /**
      * HAVING 语句中绑定的值.
      *
      * @var array
      */
-    protected $bind_having = array();
+    protected $bind_having = [];
 
     /**
      * 每页多少条记录
@@ -79,28 +79,28 @@ class Connection
      *
      * @var array
      */
-    protected $bind_values = array();
+    protected $bind_values = [];
 
     /**
      * WHERE 条件.
      *
      * @var array
      */
-    protected $where = array();
+    protected $where = [];
 
     /**
      * WHERE 语句绑定的值
      *
      * @var array
      */
-    protected $bind_where = array();
+    protected $bind_where = [];
 
     /**
      * ORDER BY 的列
      *
      * @var array
      */
-    protected $order_by = array();
+    protected $order_by = [];
 
     /**
      * ORDER BY 的排序方式,默认为升序
@@ -127,7 +127,7 @@ class Connection
      *
      * @var array
      */
-    protected $flags = array();
+    protected $flags = [];
 
     /**
      * 操作哪个表
@@ -141,7 +141,7 @@ class Connection
      *
      * @var array
      */
-    protected $last_insert_id_names = array();
+    protected $last_insert_id_names = [];
 
     /**
      * INSERT 或者 UPDATE 的列
@@ -155,7 +155,7 @@ class Connection
      *
      * @var array
      */
-    protected $returning = array();
+    protected $returning = [];
 
     /**
      * sql 的类型 SELECT INSERT DELETE UPDATE
@@ -183,14 +183,14 @@ class Connection
      *
      * @var array
      */
-    protected $settings = array();
+    protected $settings = [];
 
     /**
      * sql 的参数
      *
      * @var array
      */
-    protected $parameters = array();
+    protected $parameters = [];
 
     /**
      * 最后一条直行的 sql
@@ -216,7 +216,7 @@ class Connection
     {
         $this->type = 'SELECT';
         if (!is_array($cols)) {
-            $cols = array($cols);
+            $cols = [$cols];
         }
         $this->cols($cols);
         return $this;
@@ -479,8 +479,8 @@ class Connection
             case 'UPDATE':
             case 'INSERT':
                 return $this->getBindValuesCOMMON();
-            default :
-                throw new Exception("type err");
+            default:
+                throw new Exception('type err');
         }
     }
 
@@ -558,7 +558,7 @@ class Connection
      */
     public function fromRaw($table)
     {
-        $this->from[] = array($table);
+        $this->from[] = [$table];
         $this->from_key++;
         return $this;
     }
@@ -573,7 +573,7 @@ class Connection
      */
     public function fromSubSelect($table, $name)
     {
-        $this->from[] = array("($table) AS " . $this->quoteName($name));
+        $this->from[] = ["($table) AS " . $this->quoteName($name)];
         $this->from_key++;
         return $this;
     }
@@ -790,13 +790,13 @@ class Connection
     protected function reset()
     {
         $this->resetFlags();
-        $this->cols       = array();
-        $this->from       = array();
+        $this->cols       = [];
+        $this->from       = [];
         $this->from_key   = -1;
-        $this->where      = array();
-        $this->group_by   = array();
-        $this->having     = array();
-        $this->order_by   = array();
+        $this->where      = [];
+        $this->group_by   = [];
+        $this->having     = [];
+        $this->order_by   = [];
         $this->limit      = 0;
         $this->offset     = 0;
         $this->for_update = false;
@@ -807,27 +807,27 @@ class Connection
      */
     protected function resetAll()
     {
-        $this->union                = array();
+        $this->union                = [];
         $this->for_update           = false;
-        $this->cols                 = array();
-        $this->from                 = array();
+        $this->cols                 = [];
+        $this->from                 = [];
         $this->from_key             = -1;
-        $this->group_by             = array();
-        $this->having               = array();
-        $this->bind_having          = array();
+        $this->group_by             = [];
+        $this->having               = [];
+        $this->bind_having          = [];
         $this->paging               = 10;
-        $this->bind_values          = array();
-        $this->where                = array();
-        $this->bind_where           = array();
-        $this->order_by             = array();
+        $this->bind_values          = [];
+        $this->where                = [];
+        $this->bind_where           = [];
+        $this->order_by             = [];
         $this->limit                = 0;
         $this->offset               = 0;
-        $this->flags                = array();
+        $this->flags                = [];
         $this->table                = '';
-        $this->last_insert_id_names = array();
-        $this->col_values           = array();
-        $this->returning            = array();
-        $this->parameters           = array();
+        $this->last_insert_id_names = [];
+        $this->col_values           = [];
+        $this->returning            = [];
+        $this->parameters           = [];
     }
 
     /**
@@ -875,7 +875,7 @@ class Connection
             throw new Exception('No columns in the SELECT.');
         }
 
-        $cols = array();
+        $cols = [];
         foreach ($this->cols as $key => $val) {
             if (is_int($key)) {
                 $cols[] = $this->quoteNamesIn($val);
@@ -898,7 +898,7 @@ class Connection
             return '';
         }
 
-        $refs = array();
+        $refs = [];
         foreach ($this->from as $from) {
             $refs[] = implode(' ', $from);
         }
@@ -955,9 +955,9 @@ class Connection
         if (is_array($cond)) {
             foreach ($cond as $key => $val) {
                 if (is_string($key)) {
-                    $this->addWhere('AND', array($key, $val));
+                    $this->addWhere('AND', [$key, $val]);
                 } else {
-                    $this->addWhere('AND', array($val));
+                    $this->addWhere('AND', [$val]);
                 }
             }
         } else {
@@ -977,9 +977,9 @@ class Connection
         if (is_array($cond)) {
             foreach ($cond as $key => $val) {
                 if (is_string($key)) {
-                    $this->addWhere('OR', array($key, $val));
+                    $this->addWhere('OR', [$key, $val]);
                 } else {
-                    $this->addWhere('OR', array($val));
+                    $this->addWhere('OR', [$val]);
                 }
             }
         } else {
@@ -1132,7 +1132,7 @@ class Connection
      */
     protected function resetFlags()
     {
-        $this->flags = array();
+        $this->flags = [];
     }
 
     /**
@@ -1251,7 +1251,7 @@ class Connection
     public function quoteName($spec)
     {
         $spec = trim($spec);
-        $seps = array(' AS ', ' ', '.');
+        $seps = [' AS ', ' ', '.'];
         foreach ($seps as $sep) {
             $pos = strripos($spec, $sep);
             if ($pos) {
@@ -1304,7 +1304,7 @@ class Connection
      */
     protected function getListForQuoteNamesIn($text)
     {
-        $apos = "'";
+        $apos = '\'';
         $quot = '"';
         return preg_split(
             "/(($apos+|$quot+|\\$apos+|\\$quot+).*?\\2)/",
@@ -1430,7 +1430,7 @@ class Connection
      */
     protected function buildInto()
     {
-        return " INTO " . $this->table;
+        return ' INTO ' . $this->table;
     }
 
     /**
@@ -1457,7 +1457,7 @@ class Connection
      */
     public function col($col)
     {
-        return call_user_func_array(array($this, 'addCol'), func_get_args());
+        return call_user_func_array([$this, 'addCol'], func_get_args());
     }
 
     /**
@@ -1531,7 +1531,7 @@ class Connection
             case 'SELECT':
                 return $this->buildSELECT();
         }
-        throw new Exception("type empty");
+        throw new Exception('type empty');
     }
 
     /**
@@ -1566,7 +1566,7 @@ class Connection
      */
     protected function buildValuesForUpdate()
     {
-        $values = array();
+        $values = [];
         foreach ($this->col_values as $col => $value) {
             $values[] = "{$col} = {$value}";
         }
@@ -1684,14 +1684,14 @@ class Connection
      */
     public function __construct($host, $port, $user, $password, $db_name, $charset = 'utf8')
     {
-        $this->settings = array(
+        $this->settings = [
             'host'     => $host,
             'port'     => $port,
             'user'     => $user,
             'password' => $password,
             'dbname'   => $db_name,
-            'charset'  => $charset,
-        );
+            'charset'  => $charset
+        ];
         $this->connect();
     }
 
@@ -1700,13 +1700,12 @@ class Connection
      */
     protected function connect()
     {
-        $dsn       = 'mysql:dbname=' . $this->settings["dbname"] . ';host=' .
-            $this->settings["host"] . ';port=' . $this->settings['port'];
-        $this->pdo = new PDO($dsn, $this->settings["user"], $this->settings["password"],
-            array(
-                PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES ' . (!empty($this->settings['charset']) ?
-                        $this->settings['charset'] : 'utf8')
-            ));
+        $dsn = 'mysql:dbname='.$this->settings['dbname'].';charset='.$this->settings['charset'];
+        if (empty($this->settings['port']))
+            $dsn .= ';unix_socket=' . $this->settings['host'];
+        else
+            $dsn .= ';host='.$this->settings['host'].';port='.$this->settings['port'];
+        $this->pdo = new PDO($dsn, $this->settings['user'], $this->settings['password']);
         $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         $this->pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
     }
@@ -1726,7 +1725,7 @@ class Connection
      * @param string $parameters
      * @throws PDOException
      */
-    protected function execute($query, $parameters = "")
+    protected function execute($query, $parameters = '')
     {
         try {
             $this->sQuery = @$this->pdo->prepare($query);
@@ -1763,7 +1762,7 @@ class Connection
                 throw $e;
             }
         }
-        $this->parameters = array();
+        $this->parameters = [];
     }
 
     /**
@@ -1819,7 +1818,7 @@ class Connection
 
         $this->execute($query, $params);
 
-        $rawStatement = explode(" ", $query);
+        $rawStatement = explode(' ', $query);
 
         $statement = strtolower(trim($rawStatement[0]));
         if ($statement === 'select' || $statement === 'show') {

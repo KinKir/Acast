@@ -23,12 +23,12 @@ abstract class  ConnectionInterface
      *
      * @var array
      */
-    public static $statistics = array(
+    public static $statistics = [
         'connection_count' => 0,
         'total_request'    => 0,
         'throw_exception'  => 0,
         'send_fail'        => 0,
-    );
+    ];
 
     /**
      * Emitted when data is received.

@@ -1,7 +1,7 @@
 <?php
 
 namespace Acast;
-use Workerman\{
+use Workerman\ {
     Worker, Connection\TcpConnection
 };
 /**

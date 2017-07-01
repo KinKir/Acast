@@ -46,7 +46,7 @@ class Ws
     public static function input($buffer, $connection)
     {
         if (empty($connection->handshakeStep)) {
-            echo "recv data before handshake. Buffer:" . bin2hex($buffer) . "\n";
+            echo 'recv data before handshake. Buffer:' . bin2hex($buffer) . "\n";
             return false;
         }
         // Recv handshake response

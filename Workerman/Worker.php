@@ -210,7 +210,7 @@ class Worker
      *
      * @var array
      */
-    public $connections = array();
+    public $connections = [];
 
     /**
      * Application layer protocol.
@@ -315,7 +315,7 @@ class Worker
      *
      * @var array
      */
-    protected static $_workers = array();
+    protected static $_workers = [];
 
     /**
      * All worker porcesses pid.
@@ -323,7 +323,7 @@ class Worker
      *
      * @var array
      */
-    protected static $_pidMap = array();
+    protected static $_pidMap = [];
 
     /**
      * All worker processes waiting for restart.
@@ -331,7 +331,7 @@ class Worker
      *
      * @var array
      */
-    protected static $_pidsToRestart = array();
+    protected static $_pidsToRestart = [];
 
     /**
      * Mapping from PID to worker process ID.
@@ -339,7 +339,7 @@ class Worker
      *
      * @var array
      */
-    protected static $_idMap = array();
+    protected static $_idMap = [];
 
     /**
      * Current status.
@@ -388,32 +388,32 @@ class Worker
      *
      * @var array
      */
-    protected static $_globalStatistics = array(
+    protected static $_globalStatistics = [
         'start_timestamp'  => 0,
-        'worker_exit_info' => array()
-    );
+        'worker_exit_info' => []
+    ];
 
     /**
      * Available event loops.
      *
      * @var array
      */
-    protected static $_availableEventLoops = array(
+    protected static $_availableEventLoops = [
         'libevent' => '\Workerman\Events\Libevent',
         'event'    => '\Workerman\Events\Event'
-    );
+    ];
 
     /**
      * PHP built-in protocols.
      *
      * @var array
      */
-    protected static $_builtinTransports = array(
+    protected static $_builtinTransports = [
         'tcp'   => 'tcp',
         'udp'   => 'udp',
         'unix'  => 'unix',
         'ssl'   => 'tcp'
-    );
+    ];
 
     /**
      * Run all worker instances.
@@ -565,7 +565,7 @@ class Worker
     protected static function initId()
     {
         foreach (self::$_workers as $worker_id => $worker) {
-            $new_id_map = array();
+            $new_id_map = [];
             for($key = 0; $key < $worker->count; $key++) {
                 $new_id_map[$key] = isset(self::$_idMap[$worker_id][$key]) ? self::$_idMap[$worker_id][$key] : 0;
             }
@@ -725,11 +725,11 @@ class Worker
     protected static function installSignal()
     {
         // stop
-        pcntl_signal(SIGINT, array('\Workerman\Worker', 'signalHandler'), false);
+        pcntl_signal(SIGINT, ['\Workerman\Worker', 'signalHandler'], false);
         // reload
-        pcntl_signal(SIGUSR1, array('\Workerman\Worker', 'signalHandler'), false);
+        pcntl_signal(SIGUSR1, ['\Workerman\Worker', 'signalHandler'], false);
         // status
-        pcntl_signal(SIGUSR2, array('\Workerman\Worker', 'signalHandler'), false);
+        pcntl_signal(SIGUSR2, ['\Workerman\Worker', 'signalHandler'], false);
         // ignore
         pcntl_signal(SIGPIPE, SIG_IGN, false);
     }
@@ -748,11 +748,11 @@ class Worker
         // uninstall  status signal handler
         pcntl_signal(SIGUSR2, SIG_IGN, false);
         // reinstall stop signal handler
-        self::$globalEvent->add(SIGINT, EventInterface::EV_SIGNAL, array('\Workerman\Worker', 'signalHandler'));
+        self::$globalEvent->add(SIGINT, EventInterface::EV_SIGNAL, ['\Workerman\Worker', 'signalHandler']);
         // reinstall  reload signal handler
-        self::$globalEvent->add(SIGUSR1, EventInterface::EV_SIGNAL, array('\Workerman\Worker', 'signalHandler'));
+        self::$globalEvent->add(SIGUSR1, EventInterface::EV_SIGNAL, ['\Workerman\Worker', 'signalHandler']);
         // reinstall  status signal handler
-        self::$globalEvent->add(SIGUSR2, EventInterface::EV_SIGNAL, array('\Workerman\Worker', 'signalHandler'));
+        self::$globalEvent->add(SIGUSR2, EventInterface::EV_SIGNAL, ['\Workerman\Worker', 'signalHandler']);
     }
 
     /**
@@ -892,7 +892,7 @@ class Worker
      */
     protected static function getAllWorkerPids()
     {
-        $pid_array = array();
+        $pid_array = [];
         foreach (self::$_pidMap as $worker_pid_array) {
             foreach ($worker_pid_array as $worker_pid) {
                 $pid_array[$worker_pid] = $worker_pid;
@@ -952,8 +952,8 @@ class Worker
             if (self::$status === self::STATUS_STARTING) {
                 self::resetStd();
             }
-            self::$_pidMap  = array();
-            self::$_workers = array($worker->workerId => $worker);
+            self::$_pidMap  = [];
+            self::$_workers = [$worker->workerId => $worker];
             Timer::delAll();
             self::setProcessTitle('WorkerMan: worker process  ' . $worker->name . ' ' . $worker->getSocketName());
             $worker->setUserAndGroup();
@@ -1106,7 +1106,7 @@ class Worker
         foreach (self::$_workers as $worker) {
             $socket_name = $worker->getSocketName();
             if ($worker->transport === 'unix' && $socket_name) {
-                list(, $address) = explode(':', $socket_name, 2);
+                $address = explode(':', $socket_name, 2)[1];
                 @unlink($address);
             }
         }
@@ -1147,7 +1147,7 @@ class Worker
             }
 
             // Send reload signal to all child processes.
-            $reloadable_pid_array = array();
+            $reloadable_pid_array = [];
             foreach (self::$_pidMap as $worker_id => $worker_pid_array) {
                 $worker = self::$_workers[$worker_id];
                 if ($worker->reloadable) {
@@ -1177,7 +1177,7 @@ class Worker
             // Send reload signal to a worker process.
             posix_kill($one_worker_pid, SIGUSR1);
             // If the process does not exit after self::KILL_WORKER_TIMER_TIME seconds try to kill it.
-            Timer::add(self::KILL_WORKER_TIMER_TIME, 'posix_kill', array($one_worker_pid, SIGKILL), false);
+            Timer::add(self::KILL_WORKER_TIMER_TIME, 'posix_kill', [$one_worker_pid, SIGKILL], false);
         } // For child processes.
         else {
             $worker = current(self::$_workers);
@@ -1215,7 +1215,7 @@ class Worker
             // Send stop signal to all child processes.
             foreach ($worker_pid_array as $worker_pid) {
                 posix_kill($worker_pid, SIGINT);
-                Timer::add(self::KILL_WORKER_TIMER_TIME, 'posix_kill', array($worker_pid, SIGKILL), false);
+                Timer::add(self::KILL_WORKER_TIMER_TIME, 'posix_kill', [$worker_pid, SIGKILL], false);
             }
             if (is_file(self::$_statisticsFile))
                 unlink(self::$_statisticsFile);
@@ -1239,7 +1239,7 @@ class Worker
     {
         // For master process.
         if (self::$_masterPid === posix_getpid()) {
-            $loadavg = function_exists('sys_getloadavg') ? array_map('round', sys_getloadavg(), array(2)) : array('-', '-', '-');
+            $loadavg = function_exists('sys_getloadavg') ? array_map('round', sys_getloadavg(), [2]) : ['-', '-', '-'];
             file_put_contents(self::$_statisticsFile,
                 "---------------------------------------GLOBAL STATUS--------------------------------------------\n");
             file_put_contents(self::$_statisticsFile,
@@ -1361,7 +1361,7 @@ class Worker
             case E_USER_DEPRECATED: // 16384 //
                 return 'E_USER_DEPRECATED';
         }
-        return "";
+        return '';
     }
 
     /**
@@ -1397,12 +1397,12 @@ class Worker
      * @param string $socket_name
      * @param array  $context_option
      */
-    public function __construct($socket_name = '', $context_option = array())
+    public function __construct($socket_name = '', $context_option = [])
     {
         // Save all worker instances.
         $this->workerId                  = spl_object_hash($this);
         self::$_workers[$this->workerId] = $this;
-        self::$_pidMap[$this->workerId]  = array();
+        self::$_pidMap[$this->workerId]  = [];
 
         // Get autoload root path.
         $backtrace                = debug_backtrace();
@@ -1437,7 +1437,7 @@ class Worker
         Autoloader::setRootPath($this->_autoloadRootPath);
 
         // Get the application layer communication protocol and listening address.
-        list($scheme, $address) = explode(':', $this->_socketName, 2);
+        [$scheme, $address] = explode(':', $this->_socketName, 2);
         // Check application layer protocol class.
         if (!isset(self::$_builtinTransports[$scheme])) {
             if(class_exists($scheme)){
@@ -1493,10 +1493,10 @@ class Worker
         // Register a listener to be notified when server socket is ready to read.
         if (self::$globalEvent) {
             if ($this->transport !== 'udp') {
-                self::$globalEvent->add($this->_mainSocket, EventInterface::EV_READ, array($this, 'acceptConnection'));
+                self::$globalEvent->add($this->_mainSocket, EventInterface::EV_READ, [$this, 'acceptConnection']);
             } else {
                 self::$globalEvent->add($this->_mainSocket, EventInterface::EV_READ,
-                    array($this, 'acceptUdpConnection'));
+                    [$this, 'acceptUdpConnection']);
             }
         }
     }
@@ -1522,7 +1522,7 @@ class Worker
         self::$status = self::STATUS_RUNNING;
 
         // Register shutdown function for checking errors.
-        register_shutdown_function(array("\\Workerman\\Worker", 'checkErrors'));
+        register_shutdown_function(["\\Workerman\\Worker", 'checkErrors']);
 
         // Set autoload root path.
         Autoloader::setRootPath($this->_autoloadRootPath);
@@ -1533,13 +1533,10 @@ class Worker
             self::$globalEvent = new $event_loop_class;
             // Register a listener to be notified when server socket is ready to read.
             if ($this->_socketName) {
-                if ($this->transport !== 'udp') {
-                    self::$globalEvent->add($this->_mainSocket, EventInterface::EV_READ,
-                        array($this, 'acceptConnection'));
-                } else {
-                    self::$globalEvent->add($this->_mainSocket, EventInterface::EV_READ,
-                        array($this, 'acceptUdpConnection'));
-                }
+                if ($this->transport !== 'udp')
+                    self::$globalEvent->add($this->_mainSocket, EventInterface::EV_READ, [$this, 'acceptConnection']);
+                else
+                    self::$globalEvent->add($this->_mainSocket, EventInterface::EV_READ, [$this, 'acceptUdpConnection']);
             }
         }
 

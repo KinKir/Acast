@@ -30,20 +30,20 @@ class Event implements EventInterface
      * All listeners for read/write event.
      * @var array
      */
-    protected $_allEvents = array();
+    protected $_allEvents = [];
     
     /**
      * Event listeners of signal.
      * @var array
      */
-    protected $_eventSignal = array();
+    protected $_eventSignal = [];
     
     /**
      * All timer event listeners.
      * [func, args, event, flag, time_interval]
      * @var array
      */
-    protected $_eventTimer = array();
+    protected $_eventTimer = [];
 
     /**
      * Timer id.
@@ -63,7 +63,7 @@ class Event implements EventInterface
     /**
      * @see EventInterface::add()
      */
-    public function add($fd, $flag, $func, $args=array())
+    public function add($fd, $flag, $func, $args=[])
     {
         switch ($flag) {
             case self::EV_SIGNAL:
@@ -79,8 +79,8 @@ class Event implements EventInterface
             case self::EV_TIMER:
             case self::EV_TIMER_ONCE:
 
-                $param = array($func, (array)$args, $flag, $fd, self::$_timerId);
-                $event = new \Event($this->_eventBase, -1, \Event::TIMEOUT|\Event::PERSIST, array($this, "timerCallback"), $param);
+                $param = [$func, (array)$args, $flag, $fd, self::$_timerId];
+                $event = new \Event($this->_eventBase, -1, \Event::TIMEOUT|\Event::PERSIST, [$this, 'timerCallback'], $param);
                 if (!$event||!$event->addTimer($fd)) {
                     return false;
                 }
@@ -173,7 +173,7 @@ class Event implements EventInterface
         foreach ($this->_eventTimer as $event) {
             $event->del();
         }
-        $this->_eventTimer = array();
+        $this->_eventTimer = [];
     }
      
 

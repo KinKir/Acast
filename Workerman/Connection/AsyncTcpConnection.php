@@ -85,7 +85,7 @@ class AsyncTcpConnection extends TcpConnection
      *
      * @var array
      */
-    protected static $_builtinTransports = array(
+    protected static $_builtinTransports = [
         'tcp'   => 'tcp',
         'udp'   => 'udp',
         'unix'  => 'unix',
@@ -93,7 +93,7 @@ class AsyncTcpConnection extends TcpConnection
         'sslv2' => 'sslv2',
         'sslv3' => 'sslv3',
         'tls'   => 'tls'
-    );
+    ];
 
     /**
      * Construct.
@@ -106,7 +106,7 @@ class AsyncTcpConnection extends TcpConnection
     {
         $address_info = parse_url($remote_address);
         if (!$address_info) {
-            list($scheme, $this->_remoteAddress) = explode(':', $remote_address, 2);
+            [$scheme, $this->_remoteAddress] = explode(':', $remote_address, 2);
             if (!$this->_remoteAddress) {
                 echo new \Exception('bad remote_address');
             }
@@ -183,7 +183,7 @@ class AsyncTcpConnection extends TcpConnection
             return;
         }
         // Add socket to global event loop waiting connection is successfully established or faild. 
-        Worker::$globalEvent->add($this->_socket, EventInterface::EV_WRITE, array($this, 'checkConnection'));
+        Worker::$globalEvent->add($this->_socket, EventInterface::EV_WRITE, [$this, 'checkConnection']);
     }
 
     /**
@@ -198,7 +198,7 @@ class AsyncTcpConnection extends TcpConnection
             Timer::del($this->_reconnectTimer);
         }
         if ($after > 0) {
-            $this->_reconnectTimer = Timer::add($after, array($this, 'connect'), null, false);
+            $this->_reconnectTimer = Timer::add($after, [$this, 'connect'], null, false);
             return;
         }
         return $this->connect();
@@ -261,10 +261,7 @@ class AsyncTcpConnection extends TcpConnection
             Worker::$globalEvent->del($socket, EventInterface::EV_WRITE);
             // Nonblocking.
             stream_set_blocking($socket, 0);
-            // Compatible with hhvm
-            if (function_exists('stream_set_read_buffer')) {
-                stream_set_read_buffer($socket, 0);
-            }
+            stream_set_read_buffer($socket, 0);
             // Try to open keepalive for tcp and disable Nagle algorithm.
             if (function_exists('socket_import_stream') && $this->transport === 'tcp') {
                 $raw_socket = socket_import_stream($socket);
@@ -272,10 +269,10 @@ class AsyncTcpConnection extends TcpConnection
                 socket_set_option($raw_socket, SOL_TCP, TCP_NODELAY, 1);
             }
             // Register a listener waiting read event.
-            Worker::$globalEvent->add($socket, EventInterface::EV_READ, array($this, 'baseRead'));
+            Worker::$globalEvent->add($socket, EventInterface::EV_READ, [$this, 'baseRead']);
             // There are some data waiting to send.
             if ($this->_sendBuffer) {
-                Worker::$globalEvent->add($socket, EventInterface::EV_WRITE, array($this, 'baseWrite'));
+                Worker::$globalEvent->add($socket, EventInterface::EV_WRITE, [$this, 'baseWrite']);
             }
             $this->_status                = self::STATUS_ESTABLISH;
             $this->_remoteAddress         = $address;
@@ -296,7 +293,7 @@ class AsyncTcpConnection extends TcpConnection
             // Try to emit protocol::onConnect
             if (method_exists($this->protocol, 'onConnect')) {
                 try {
-                    call_user_func(array($this->protocol, 'onConnect'), $this);
+                    call_user_func([$this->protocol, 'onConnect'], $this);
                 } catch (\Exception $e) {
                     Worker::log($e);
                     exit(250);

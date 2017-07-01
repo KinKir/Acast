@@ -45,7 +45,7 @@ class Cron {
      * @param int $interval
      */
     protected function __construct(int $interval) {
-        $this->_timer_id = Timer::add($interval, [__CLASS__, 'timerCallback'], [], true);
+        $this->_timer_id = Timer::add($interval, [$this, 'timerCallback'], [], true);
     }
     /**
      * 析构函数

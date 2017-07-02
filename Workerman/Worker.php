@@ -1440,7 +1440,7 @@ class Worker
         [$scheme, $address] = explode(':', $this->_socketName, 2);
         // Check application layer protocol class.
         if (!isset(self::$_builtinTransports[$scheme])) {
-            if(class_exists($scheme)){
+            if (class_exists($scheme)) {
                 $this->protocol = $scheme;
             } else {
                 $scheme         = ucfirst($scheme);

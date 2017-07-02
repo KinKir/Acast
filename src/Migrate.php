@@ -53,14 +53,12 @@ class Migrate {
      * @param $sql_path
      */
     protected function __construct($settings, $sql_path) {
-        $host = $settings['host'];
-        $port = $settings['port'];
-        $user = $settings['user'];
-        $password = $settings['password'];
-        $charset = $settings['charset'];
-        $this->_pdo = new \PDO('mysql:host='.$host.';port='.$port, $user, $password, [
-            \PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES '.$charset
-        ]);
+        $dsn = 'mysql:charset='.$settings['charset'];
+        if (empty($settings['port']))
+            $dsn .= ';unix_socket=' . $settings['host'];
+        else
+            $dsn .= ';host='.$settings['host'].';port='.$settings['port'];
+        $this->_pdo = new \PDO($dsn, $settings['user'], $settings['password']);
         $this->_pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
         $this->_sql = file_get_contents($sql_path);
         if ($this->_sql === false) {

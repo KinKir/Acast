@@ -403,11 +403,6 @@ class Router
             $names = [$names];
         foreach ($this->_pSet[self::_SIBLINGS] as &$pSet) {
             foreach ($names as $name) {
-                if ($name[0] == '#') {
-                    if (DEBUG_MODE)
-                        $name = substr($name, 1);
-                    else continue;
-                }
                 $callback = Middleware::fetch($name);
                 if ($callback) {
                     if (!is_callable($callback)) {

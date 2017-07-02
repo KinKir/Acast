@@ -411,7 +411,7 @@ class Ws
             }
             // Headbeat.
             if (!empty($connection->websocketPingInterval)) {
-                $connection->websocketPingTimer = Timer::add($connection->websocketPingInterval, function() use ($connection){
+                $connection->websocketPingTimer = Timer::add($connection->websocketPingInterval, function() use ($connection) {
                     if (false === $connection->send(pack('H*', '8900'), true)) {
                         Timer::del($connection->websocketPingTimer);
                         $connection->websocketPingTimer = null;

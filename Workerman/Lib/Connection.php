@@ -1594,16 +1594,15 @@ class Connection
      * 设置列
      *
      * @param string $col
+     * @param mixed $val
      * @return self
      */
-    protected function addCol($col)
+    protected function addCol($col, $val = null)
     {
         $key                    = $this->quoteName($col);
         $this->col_values[$key] = ":$col";
-        $args                   = func_get_args();
-        if (count($args) > 1) {
-            $this->bindValue($col, $args[1]);
-        }
+        if (isset($val))
+            $this->bindValue($col, $val);
         return $this;
     }
 
@@ -1616,11 +1615,10 @@ class Connection
     protected function addCols(array $cols)
     {
         foreach ($cols as $key => $val) {
-            if (is_int($key)) {
+            if (is_int($key))
                 $this->addCol($val);
-            } else {
+            else
                 $this->addCol($key, $val);
-            }
         }
         return $this;
     }

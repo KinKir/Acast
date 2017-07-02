@@ -231,13 +231,12 @@ class Router
             Console::warning('Failed to call. Invalid pointer.');
             return false;
         }
-        foreach ($this->_generators as $generator)
-            $generator->current();
+        $g_count = count($this->_generators);
+        foreach ($this->_generators as $key => $generator)
+            $generator->send($key + 1 == $g_count);
         $ret = $this->_routerCall();
-        while ($generator = array_pop($this->_generators)) {
-            if ($generator->valid())
-                 $generator->next();
-        }
+        while ($generator = array_pop($this->_generators))
+            $generator->next();
         $this->_generators = [];
         return $ret;
     }
@@ -257,15 +256,15 @@ class Router
         if (!isset($pCall[self::_MIDDLEWARE]))
             return;
         foreach ($pCall[self::_MIDDLEWARE] as $callback) {
+            $is_last = yield;
             if ($this->_delayed) {
                 $this->_delayed = false;
                 yield;
             }
-            if (!($callback() ?? true))
+            if (!($callback($is_last) ?? true))
                 break;
         }
         $this->_delayed = false;
-        yield;
     }
     /**
      * 调用路由回调

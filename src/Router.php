@@ -255,8 +255,8 @@ class Router
     private function _mCall(&$pCall) {
         if (!isset($pCall[self::_MIDDLEWARE]))
             return;
+        $is_last = yield;
         foreach ($pCall[self::_MIDDLEWARE] as $callback) {
-            $is_last = yield;
             if ($this->_delayed) {
                 $this->_delayed = false;
                 yield;

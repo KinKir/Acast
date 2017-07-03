@@ -50,7 +50,7 @@ class Cron {
     /**
      * 析构函数
      */
-    function __destruct(){
+    function __destruct() {
         Timer::del($this->_timer_id);
     }
     /**

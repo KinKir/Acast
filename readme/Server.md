@@ -8,9 +8,9 @@
 
 事实上，每一个服务提供者是对一个`Workerman`的`Worker`实例的封装。和`Acast`框架的所有其他组件一样，它位于`Acast`命名空间下。
 
-`$listen`为服务监听的端口。
+`$listen`为服务监听的端口。根据服务类型的不同，服务所使用的协议也不同。`Acast\Http`主要提供HTTP协议，而`Acast\Socket`提供各种基于TCP长连接的协议，包括Webocket。
 
-如果需要提供HTTPS服务，`$ssl`格式应满足以下示例中格式，否则为空：
+如果需要提供HTTPS或WSS服务，`$ssl`格式应满足以下示例中格式，否则为空：
 
 ```php
 Server::create('demo', 443, [
@@ -20,7 +20,7 @@ Server::create('demo', 443, [
 ]);
 ```
 
-注意，如果使用了HTTPS，PHP必须安装有`openssl`扩展。
+注意，如果使用了SSL，PHP必须安装有`openssl`扩展。
 
 ### 获取服务
 
@@ -44,7 +44,7 @@ Server::create('demo', 443, [
 
 `Acast`服务提供者的事件是对`Workerman`事件的一个封装，要求用户传递事件类型及回调函数，并交由`Workerman`处理。调用回调函数时会传递对应`Worker`实例。
 
-当前支持的事件有："start", "stop", "bufferFull", "bufferDrain"。
+当前支持的事件有："start", "stop", "bufferFull", "bufferDrain"。如果使用WebSocket协议，则额外支持"handshake"事件。
 
 其中，start回调会在当前服务的每个进程启动时被调用，同理，stop回调是在每个进程正常终止时被调用。
 

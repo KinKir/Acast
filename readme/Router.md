@@ -14,9 +14,9 @@
 
 > function Router::add(?array $path, $methods, callable $callback) Router
 
-1. `$path`为Request URI以"/"为分界符分割后的数组。如果是根目录，则为空数组。如果要将数组的某个成员作为参数捕获，则在其之前加"/"。路由匹配成功后，其值将保存到`$this->urlParams`中。例如，`$path`为\['id', '/id', 'name', '/name'\]，且Request URI为"/id/3/name/foo"时，就会得到`$this->urlParams` = \['id => '3', 'name' => 'foo'\]。
+1. `$path`为Request URI以"/"为分界符分割后的数组。如果是根目录，则为空数组。如果要将数组的某个成员作为参数捕获，则在其之前加"/"。路由匹配成功后，其值将保存到`$this->params`中。例如，`$path`为\['id', '/id', 'name', '/name'\]，且Request URI为"/id/3/name/foo"时，就会得到`$this->params` = \['id => '3', 'name' => 'foo'\]。
 
-2. `$methods`为HTTP请求的方法，包括"POST", "GET", "PUT"等。可以传递一个数组，包含所有需要匹配的方法。
+2. `$methods`为HTTP请求的方法，包括"POST", "GET", "PUT"等。可以传递一个数组，包含所有需要匹配的方法。若当前不处于HTTP环境，则该参数可以根据情况自定义。
 
 3. `$callback`为回调函数。如果不是闭包，它将会自动被转化为闭包。然后，闭包会与当前路由实例绑定，在回调函数内可以通过`$this`指针调用其方法并访问其成员变量。
 
@@ -80,19 +80,17 @@ Router::instance('demo')->add(['new'], 'GET', function () {
 });
 ```
 
-调用此方法后，建议不要向当前连接的客户端发送任何数据，以免冲突。
-
 ### 成员变量说明
 
-1. `$this->urlParams`: 数组，保存通过路由匹配到的Request URI中的参数。
+1. `$this->params`: 数组，保存通过路由匹配到的Request URI中的参数。
 
 2. `$this->mRet`: 建议用该变量保存中间件的返回值以便其他中间件、路由或者控制器使用。
 
-3. `$this->retMsg`: 路由回调结束后返回给用户的数据。
+3. `$this->retMsg`: 路由回调结束后返回给用户的数据。\(仅在HTTP环境下有效\)
 
-4. `$this->connection`: 与客户端的连接实例。一般用于在输入中间件中直接输出错误信息并关闭连接。不建议在路由回调或输出中间件中使用。由于关闭连接的操作是异步的，因此调用$this-\>connection-\>close\(\)时后应直接返回false，否则可能出现不可预料的错误。
+4. `$this->connection`: 与客户端的连接实例。一般用于在输入中间件中直接输出错误信息并关闭连接。\(仅在HTTP环境下有效\)不建议在路由回调或输出中间件中使用。由于关闭连接的操作是异步的，因此调用$this-\>connection-\>close\(\)时后应直接返回false，否则可能出现不可预料的错误。
 
-5. `$this->method`: HTTP请求的方法。
+5. `$this->method`: HTTP请求的方法。非HTTP环境可以自定义该参数的获取方式。
 
 6. `$this->rawRequest`: 客户端发来的完整的请求内容。
 

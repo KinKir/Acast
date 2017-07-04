@@ -1,9 +1,8 @@
 <?php
 
 namespace Acast;
-use Workerman\ {
-    Connection\TcpConnection
-};
+use Workerman\Worker;
+
 /**
  * 路由
  * @package Acast
@@ -50,6 +49,11 @@ class Router {
      */
     protected $_delayed = false;
     /**
+     * 控制器实例（临时）
+     * @var Controller
+     */
+    protected $_object;
+    /**
      * 生成器列表
      * @var array
      */
@@ -64,16 +68,6 @@ class Router {
      * @var mixed
      */
     public $mRet;
-    /**
-     * 返回参数
-     * @var mixed
-     */
-    public $retMsg;
-    /**
-     * 连接实例
-     * @var TcpConnection
-     */
-    public $connection;
     /**
      * HTTP请求方法
      * @var string
@@ -93,8 +87,9 @@ class Router {
      * @param string $name
      */
     protected static function create(string $name) {
-        if (!class_exists(__NAMESPACE__.'\\RouterWrapper'))
-            eval('namespace '.__NAMESPACE__.'; class RouterWrapper extends \\'.__NAMESPACE__.'\\Router{}');
+        $namespace = self::_getNamespace();
+        if (!class_exists($namespace.'\\RouterWrapper'))
+            eval('namespace '.$namespace.'; class RouterWrapper extends \\'.$namespace.'\\Router{}');
         if (isset(self::$routers[$name]))
             Console::fatal("Router \"$name\" already exists.");
     }
@@ -119,7 +114,7 @@ class Router {
      */
     function add(?array $path, $methods, callable $callback) : self {
         unset($this->_pSet);
-        $this->toClosure($callback);
+        $this->_toClosure($callback);
         if (!is_array($methods))
             $methods = [$methods];
         $siblings = [];
@@ -164,7 +159,7 @@ class Router {
      * @return bool
      */
     function locate(array $path, string $method) : bool {
-        unset($this->params, $this->retMsg, $this->mRet);
+        unset($this->params, $this->mRet);
         $this->method = $method;
         if (!isset($this->_tree[$method]))
             goto Err;
@@ -194,7 +189,6 @@ class Router {
             $this->_mPush();
             goto Success;
         }
-        $this->retMsg = 'Not found.';
         return false;
         Success:
         $this->_call();
@@ -266,15 +260,12 @@ class Router {
      *
      * @return bool
      */
-    private function _routerCall() : bool {
-        $status = $this->connection->getStatus();
-        if ($status === TcpConnection::STATUS_CLOSING || $status === TcpConnection::STATUS_CLOSED)
-            return false;
+    protected function _routerCall() : bool {
         $callback = $this->_pCall[self::_CALLBACK];
         try {
             return $callback() ?? true;
         } catch (\PDOException $exception) {
-            $this->retMsg = View::http(500, $exception->getMessage());
+            Worker::log($exception->getMessage());
             return false;
         }
     }
@@ -309,20 +300,19 @@ class Router {
      *
      * @param string|int $name
      * @param mixed $param
-     * @return mixed
+     * @return bool
      */
     protected function invoke($name = 0, $param = null) {
-        $controller = $this->_pCall[self::_CONTROLLER][$name] ?? Controller::$globals[$name] ?? null;
+        $controller = $this->_pCall[self::_CONTROLLER][$name] ?? Controller::$globals[$name];
         if (!isset($controller)) {
             Console::warning("Invalid controller binding \"$name\".");
             return false;
         }
         $class = $controller[0];
         $method = $controller[1];
-        $object = new $class($this);
-        $ret = $object->$method($param);
-        $this->mRet = $object->mRet;
-        $this->retMsg = $object->retMsg;
+        $this->_object = new $class($this);
+        $ret = $this->_object->$method($param);
+        $this->mRet = $this->_object->mRet;
         return $ret;
     }
     /**
@@ -387,7 +377,7 @@ class Router {
                         Console::warning('Failed to bind middleware. Callback function not callable.');
                         continue;
                     }
-                    $this->toClosure($callback);
+                    $this->_toClosure($callback);
                     $pSet[self::_MIDDLEWARE][] = $callback;
                 }
             }
@@ -399,9 +389,18 @@ class Router {
      *
      * @param callable $callback
      */
-    private function toClosure(callable &$callback) {
+    private function _toClosure(callable &$callback) {
         if (!($callback instanceof \Closure))
             $callback = \Closure::fromCallable($callback);
-        $callback = \Closure::bind($callback, $this, __NAMESPACE__.'\\RouterWrapper');
+        $callback = \Closure::bind($callback, $this, self::_getNamespace().'\\RouterWrapper');
+    }
+    /**
+     * 获取当前调用位置所在命名空间
+     *
+     * @return bool|string
+     */
+    private static function _getNamespace() {
+        $class = get_called_class();
+        return substr($class, 0, strrpos($class, '\\'));
     }
 }

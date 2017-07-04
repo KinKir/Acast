@@ -43,7 +43,7 @@ abstract class View {
         }
         if ($use_memcache) {
             self::$_templates[$name] = false;
-            if (!Server::$memcached->set('mem_'.$name, $data))
+            if (!Server::$memcached->set('view_'.$name, $data))
                 Console::warning("Failed to set memcached for view \"$name\".");
         } else
             self::$_templates[$name] = $data;
@@ -60,15 +60,9 @@ abstract class View {
             return $this;
         }
         if (self::$_templates[$name] === false)
-            $this->_temp = Server::$memcached->get('mem_'.$name);
+            $this->_temp = Server::$memcached->get('view_'.$name);
         else
             $this->_temp = self::$_templates[$name];
         return $this;
-    }
-    /**
-     * 将视图回传给控制器
-     */
-    function show() {
-        $this->_controller->retMsg = $this->_temp;
     }
 }

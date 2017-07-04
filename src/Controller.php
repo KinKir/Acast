@@ -17,12 +17,7 @@ abstract class Controller {
      */
     public $mRet;
     /**
-     * 返回数据
-     * @var mixed
-     */
-    public $retMsg;
-    /**
-     * GET参数
+     * 路由参数
      * @var array
      */
     protected $params = [];
@@ -56,7 +51,6 @@ abstract class Controller {
             $this->model = new $name;
         $this->method = $router->method;
         $this->params = $router->params ?? [];
-        $this->retMsg = $router->retMsg ?? null;
         $this->mRet = $router->mRet ?? null;
     }
     /**

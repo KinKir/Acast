@@ -53,7 +53,7 @@ class Server extends \Acast\Server {
         if (empty($path[0]) && count($path) == 1)
             $path = [];
         if (!$this->_router->locate($path, $_SERVER['REQUEST_METHOD']))
-            Http::header('HTTP', 404);
+            $this->_router->retMsg = View::http(404, 'Not found.');
         if (ENABLE_SESSION)
             Http::sessionWriteClose();
         if (($connection->forward ?? false) == true)

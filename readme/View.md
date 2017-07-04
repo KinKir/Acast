@@ -16,7 +16,7 @@
 
 2. `$data`为视图内容，可以为字符串或者对象。支持[Plates](http://platesphp.com/)等模版。
 
-3. 是否使用`Memcached`。该选项一般用于需要跨进程、跨服务共享，而内存占用较高的视图模版。
+3. 是否使用`Memcached`。该选项一般用于需要跨进程、跨服务共享的视图模版。
 
 ### 取出视图
 
@@ -24,14 +24,16 @@
 
 > function View::show() void
 
-fetch方法取出的视图将保存到局部变量`$this->_temp`中，可以对其进一步处理。直至调用`show()`方法将其回传到控制器的`retMsg`中。
+`View::fetch()`方法取出的视图将保存到局部变量`$this->_temp`中，可以对其进一步处理。
 
-### 其他
-
-`Acast\View`内置两个成员函数，`View::err()`和`View::json()`，便于返回错误信息或将数组格式化为JSON。
+`View::show()`方法将其回传到控制器的`retMsg`中。\(仅在HTTP环境下有效\)
 
 如：
 
 ```php
 $this->view->err('404', 'Page not found!')->show();
 ```
+
+### 其他
+
+`Acast\Http\View`内置两个成员函数，`View::err()`和`View::json()`，便于返回错误信息或将数组格式化为JSON。

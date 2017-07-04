@@ -6,10 +6,49 @@ use Acast\ {
     Config
 };
 use Workerman\ {
-    Connection\AsyncTcpConnection
+    Connection\AsyncTcpConnection,
+    Connection\TcpConnection
 };
 
 class Router extends \Acast\Router {
+    /**
+     * 返回参数
+     * @var mixed
+     */
+    public $retMsg;
+    /**
+     * 连接实例
+     * @var TcpConnection
+     */
+    public $connection;
+    /**
+     * 控制器实例（临时）
+     * @var Controller
+     */
+    protected $_object;
+    /**
+     * 调用路由回调
+     *
+     * @return bool
+     */
+    protected function _routerCall() : bool {
+        $status = $this->connection->getStatus();
+        if ($status === TcpConnection::STATUS_CLOSING || $status === TcpConnection::STATUS_CLOSED)
+            return false;
+        return parent::_routerCall();
+    }
+    /**
+     * 调用已注册的控制器中的方法
+     *
+     * @param string|int $name
+     * @param mixed $param
+     * @return mixed
+     */
+    protected function invoke($name = 0, $param = null) {
+        $ret = parent::invoke($name, $param);
+        $this->retMsg = $this->_object->retMsg;
+        return $ret;
+    }
     /**
      * 转发HTTP请求
      *

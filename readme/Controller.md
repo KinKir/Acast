@@ -26,11 +26,11 @@ $controllers的格式同`Router::bind()`，但是不可以省略别名。
 
 ### 成员变量
 
-1. `$this->urlParams`: 拷贝自路由实例。
+1. `$this->params`: 拷贝自路由实例。
 
 2. `$this->mRet`: 拷贝自路由实例。
 
-3. `$this->retMsg`: 拷贝自路由实例，调用结束后拷贝回路由。
+3. `$this->retMsg`: 拷贝自路由实例，调用结束后拷贝回路由。\(仅在HTTP环境下有效\)
 
 4. `$this->model`: 绑定的模型示例。
 

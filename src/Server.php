@@ -2,7 +2,10 @@
 
 namespace Acast;
 use Workerman\ {
-    Worker, Connection\TcpConnection
+    Worker,
+    Protocols\Http,
+    Protocols\HttpCache,
+    Connection\TcpConnection
 };
 /**
  * 服务
@@ -146,6 +149,8 @@ class Server {
             $path = [];
         $this->_router->rawRequest = $data;
         $this->_router->locate($path, $_SERVER['REQUEST_METHOD']);
+        if (ENABLE_SESSION)
+            Http::sessionWriteClose();
         if (($connection->forward ?? false) == true)
             return;
         $connection->send($this->_router->retMsg ?? '');
@@ -239,6 +244,8 @@ class Server {
                 Console::fatal('Invalid onStart callback.');
             $callback();
         }
+        if (ENABLE_SESSION)
+            HttpCache::init();
         Worker::runAll();
     }
     /**

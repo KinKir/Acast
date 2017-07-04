@@ -16,3 +16,7 @@ const DEFAULT_WORKER_CONFIG = [
  * 是否为调试模式
  */
 const DEBUG_MODE = false;
+/**
+ * 是否启用$_SESSION
+ */
+const ENABLE_SESSION = false;

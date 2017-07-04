@@ -221,9 +221,6 @@ class Http
         // header
         $header .= "Content-Length: " . strlen($content) . "\r\n\r\n";
 
-        // save session
-        //self::sessionWriteClose();
-
         // the whole http package
         return $header . $content;
     }
@@ -551,5 +548,3 @@ class HttpCache
         @\session_start();
     }
 }
-
-//HttpCache::init();

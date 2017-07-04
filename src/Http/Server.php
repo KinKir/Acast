@@ -18,6 +18,18 @@ class Server extends \Acast\Server {
      */
     protected $_router;
     /**
+     * 构造函数
+     *
+     * @param string $name
+     * @param string $protocol
+     * @param int|null $port
+     * @param array $ssl
+     */
+    protected function __construct(string $name, string $protocol, ?int $port, array $ssl = null) {
+        parent::__construct($name, $protocol, $port, $ssl);
+        $this->workerConfig(DEFAULT_WORKER_CONFIG);
+    }
+    /**
      * 注册服务
      *
      * @param string $app

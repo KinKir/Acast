@@ -91,7 +91,6 @@ class Server {
         $this->_worker->onWorkerStart = [$this, 'onServerStart'];
         $this->_worker->onWorkerStop = [$this, 'onServerStop'];
         $this->_worker->onMessage = [$this, 'onMessage'];
-        $this->workerConfig(DEFAULT_WORKER_CONFIG);
     }
     /**
      * 配置Workerman

@@ -1,4 +1,6 @@
 <?php
+
+namespace Acast;
 /**
  * 检查当前PHP版本
  */
@@ -18,6 +20,11 @@ if (php_sapi_name() != 'cli') {
  * 引用依赖
  */
 require_once __DIR__ . '/Constants.php';
-require_once Acast\WORKERMAN_ROOT . '/Autoloader.php';
+require_once WORKERMAN_ROOT . '/Autoloader.php';
 foreach (glob(__DIR__ . '/src/*.php') as $require_file)
     require_once $require_file;
+
+if (ENABLE_HTTP) {
+    foreach (glob(__DIR__.'/Http/*.php') as $require_file)
+        require_once $require_file;
+}

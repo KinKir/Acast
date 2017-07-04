@@ -25,6 +25,6 @@ foreach (glob(__DIR__ . '/src/*.php') as $require_file)
     require_once $require_file;
 
 if (ENABLE_HTTP) {
-    foreach (glob(__DIR__.'/Http/*.php') as $require_file)
+    foreach (glob(__DIR__.'/src/Http/*.php') as $require_file)
         require_once $require_file;
 }

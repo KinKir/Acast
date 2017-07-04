@@ -38,7 +38,7 @@ class Server extends \Acast\Server {
      */
     static function create(string $app, ?string $listen = null, ?array $ssl = null) {
         parent::create($app);
-        self::$_apps[$app] = new self($app, $listen, 'http', $ssl);
+        self::$_apps[$app] = new self($app, 'http', $listen, $ssl);
     }
     /**
      * 收到请求回调

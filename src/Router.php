@@ -2,15 +2,13 @@
 
 namespace Acast;
 use Workerman\ {
-    Connection\AsyncTcpConnection,
     Connection\TcpConnection
 };
 /**
  * 路由
  * @package Acast
  */
-class Router
-{
+class Router {
     /**
      * 路由常量
      */
@@ -57,10 +55,10 @@ class Router
      */
     private $_generators = [];
     /**
-     * GET参数
+     * 路由参数
      * @var array
      */
-    public $urlParams = [];
+    public $params = [];
     /**
      * 中间件返回数据
      * @var mixed
@@ -94,12 +92,11 @@ class Router
      * 创建路由实例
      * @param string $name
      */
-    static function create(string $name) {
-        if (!class_exists('Acast\\RouterWrapper'))
-            eval('namespace Acast; class RouterWrapper extends Router{}');
+    protected static function create(string $name) {
+        if (!class_exists(__NAMESPACE__.'\\RouterWrapper'))
+            eval('namespace '.__NAMESPACE__.'; class RouterWrapper extends \\'.__NAMESPACE__.'\\Router{}');
         if (isset(self::$routers[$name]))
             Console::fatal("Router \"$name\" already exists.");
-        self::$routers[$name] = new self;
     }
     /**
      * 获取路由实例
@@ -122,9 +119,7 @@ class Router
      */
     function add(?array $path, $methods, callable $callback) : self {
         unset($this->_pSet);
-        if (!($callback instanceof \Closure))
-            $callback = \Closure::fromCallable($callback);
-        $callback = \Closure::bind($callback, $this, 'Acast\\RouterWrapper');
+        $this->toClosure($callback);
         if (!is_array($methods))
             $methods = [$methods];
         $siblings = [];
@@ -169,7 +164,7 @@ class Router
      * @return bool
      */
     function locate(array $path, string $method) : bool {
-        unset($this->urlParams, $this->retMsg, $this->mRet);
+        unset($this->params, $this->retMsg, $this->mRet);
         $this->method = $method;
         if (!isset($this->_tree[$method]))
             goto Err;
@@ -180,7 +175,7 @@ class Router
                 $this->_pCall = &$this->_pCall[$value];
             elseif (isset($this->_pCall[self::_PARAMETER])) {
                 $this->_pCall = &$this->_pCall[self::_PARAMETER];
-                $this->urlParams[$this->_pCall[self::_NAME]] = $value;
+                $this->params[$this->_pCall[self::_NAME]] = $value;
             } else goto Err;
             $this->_mPush();
         }
@@ -189,7 +184,7 @@ class Router
             goto Success;
         if (isset($this->_pCall[self::_PARAMETER])) {
             $this->_pCall = &$this->_pCall[self::_PARAMETER];
-            $this->urlParams[$this->_pCall[self::_NAME]] = '';
+            $this->params[$this->_pCall[self::_NAME]] = '';
             $this->_mPush();
             goto Loop;
         }
@@ -199,7 +194,7 @@ class Router
             $this->_mPush();
             goto Success;
         }
-        $this->retMsg = View::http(404, 'Not found.');
+        $this->retMsg = 'Not found.';
         return false;
         Success:
         $this->_call();
@@ -331,23 +326,6 @@ class Router
         return $ret;
     }
     /**
-     * 转发HTTP请求
-     *
-     * @param string $name
-     */
-    protected function forward(string $name) {
-        $this->connection->forward = true;
-        if (!isset($this->connection->remotes[$name]))
-            $this->connection->remotes[$name] = new AsyncTcpConnection(Config::get('FORWARD_'.$name));
-        $remote = $this->connection->remotes[$name];
-        $remote->pipe($this->connection);
-        $this->connection->onClose = function () use ($remote) {
-            $remote->close();
-        };
-        $remote->connect();
-        $remote->send($this->rawRequest);
-    }
-    /**
      * 绑定控制器及其方法
      *
      * @param array $controllers
@@ -409,13 +387,21 @@ class Router
                         Console::warning('Failed to bind middleware. Callback function not callable.');
                         continue;
                     }
-                    if (!($callback instanceof \Closure))
-                        $callback = \Closure::fromCallable($callback);
-                    $callback = \Closure::bind($callback, $this, 'Acast\\RouterWrapper');
+                    $this->toClosure($callback);
                     $pSet[self::_MIDDLEWARE][] = $callback;
                 }
             }
         }
         return $this;
+    }
+    /**
+     * 将回调函数转换为闭包并绑定当前路由实例
+     *
+     * @param callable $callback
+     */
+    private function toClosure(callable &$callback) {
+        if (!($callback instanceof \Closure))
+            $callback = \Closure::fromCallable($callback);
+        $callback = \Closure::bind($callback, $this, __NAMESPACE__.'\\RouterWrapper');
     }
 }

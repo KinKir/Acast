@@ -25,7 +25,7 @@ abstract class Controller {
      * GET参数
      * @var array
      */
-    protected $urlParams = [];
+    protected $params = [];
     /**
      * 绑定的模型
      * @var Model
@@ -55,7 +55,7 @@ abstract class Controller {
         if (class_exists($name))
             $this->model = new $name;
         $this->method = $router->method;
-        $this->urlParams = $router->urlParams ?? [];
+        $this->params = $router->params ?? [];
         $this->retMsg = $router->retMsg ?? null;
         $this->mRet = $router->mRet ?? null;
     }
@@ -67,10 +67,6 @@ abstract class Controller {
      */
     protected function invoke(string $name) : ?Model {
         $class = Server::$name.'\\Model\\'.$name;
-        if (!class_exists($class) || !is_subclass_of($class, Model::class)) {
-            Console::warning("Invalid Model \"$name\"");
-            return null;
-        }
         return new $class($this->view);
     }
     /**

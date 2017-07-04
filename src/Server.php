@@ -3,8 +3,6 @@
 namespace Acast;
 use Workerman\ {
     Worker,
-    Protocols\Http,
-    Protocols\HttpCache,
     Connection\TcpConnection
 };
 /**
@@ -74,22 +72,18 @@ class Server {
      */
     static $name;
     /**
-     * 是否转发
-     * @var bool
-     */
-    static $forward;
-    /**
      * 构造函数
      *
      * @param string $name
-     * @param int|null $listen
+     * @param string $protocol
+     * @param int|null $port
      * @param array $ssl
      */
-    protected function __construct(string $name, ?int $listen, array $ssl = null) {
+    protected function __construct(string $name, string $protocol, ?int $port, array $ssl = null) {
         $this->_name = $name;
-        $this->_listen = isset($listen);
+        $this->_listen = isset($port);
         $this->_worker = new Worker(
-            $this->_listen ? 'http://[::]:'.$listen : '',
+            $this->_listen ? $protocol.'://[::]:'.$port : '',
             $ssl ? ['ssl' => $ssl] : []
         );
         if ($ssl)
@@ -123,17 +117,14 @@ class Server {
      * 注册服务
      *
      * @param string $app
-     * @param string $listen
-     * @param array $ssl
      */
-    static function create(string $app, ?string $listen = null, ?array $ssl = null) {
+    protected static function create(string $app) {
         if (self::$_status > self::_STATUS_INITIAL) {
             Console::warning('Cannot create application once the service is started.');
             return;
         }
         if (isset(self::$_apps[$app]))
             Console::fatal("Failed to create app. App \"$app\" exists!");
-        self::$_apps[$app] = new self($app, $listen, $ssl);
     }
     /**
      * 收到请求回调
@@ -143,17 +134,7 @@ class Server {
      */
     function onMessage(TcpConnection $connection, $data) {
         $this->_router->connection = $this->_connection = $connection;
-        $connection->forward = false;
-        $path = explode('/', substr(explode('?', $_SERVER['REQUEST_URI'], 2)[0], 1));
-        if (empty($path[0]) && count($path) == 1)
-            $path = [];
         $this->_router->rawRequest = $data;
-        $this->_router->locate($path, $_SERVER['REQUEST_METHOD']);
-        if (ENABLE_SESSION)
-            Http::sessionWriteClose();
-        if (($connection->forward ?? false) == true)
-            return;
-        $connection->send($this->_router->retMsg ?? '');
     }
     /**
      * 绑定事件回调
@@ -212,8 +193,6 @@ class Server {
         pcntl_signal(SIGCHLD, SIG_IGN); //将子进程转交给内核，防止僵尸进程。
         if (is_callable($this->_on_start))
             call_user_func($this->_on_start, $worker);
-        if (!isset($this->_router) && $this->_listen)
-            Console::warning("No router bound to server \"$this->_name\".");
         self::$_status = self::_STATUS_STARTED;
     }
     /**
@@ -239,13 +218,8 @@ class Server {
             }
         }
         self::$_status = self::_STATUS_STARTING;
-        if (isset($callback)) {
-            if (!is_callable($callback))
-                Console::fatal('Invalid onStart callback.');
+        if (is_callable($callback))
             $callback();
-        }
-        if (ENABLE_SESSION)
-            HttpCache::init();
         Worker::runAll();
     }
     /**

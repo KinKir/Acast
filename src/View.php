@@ -1,7 +1,6 @@
 <?php
 
 namespace Acast;
-use Workerman\Protocols\Http;
 /**
  * 视图
  * @package Acast
@@ -13,7 +12,7 @@ abstract class View {
      */
     protected static $_templates = [];
     /**
-     * 绑定的计数器
+     * 绑定的控制器
      * @var Controller
      */
     protected $_controller;
@@ -67,34 +66,9 @@ abstract class View {
         return $this;
     }
     /**
-     * 置HTTP状态码
-     *
-     * @param int $code
-     * @param string|null $msg
-     * @return string|null
-     */
-    static function http(int $code, ?string $msg = null) {
-        Http::header('HTTP', $code);
-        return $msg;
-    }
-    /**
-     * 格式化为JSON
-     *
-     * @param array $data
-     * @param int $err
-     * @return string
-     */
-    static function json(array $data, int $err = 0) {
-        Http::header('Content-Type: application/json');
-        return json_encode(['err' => $err] + $data);
-    }
-    /**
      * 将视图回传给控制器
      */
     function show() {
-        if (!isset($this->_temp))
-            $this->_controller->retMsg = View::http(500, 'Server failed to give any response.');
-        else
-            $this->_controller->retMsg = $this->_temp;
+        $this->_controller->retMsg = $this->_temp;
     }
 }

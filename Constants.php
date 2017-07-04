@@ -17,6 +17,6 @@ const DEFAULT_WORKER_CONFIG = [
  */
 const DEBUG_MODE = false;
 /**
- * 是否启用$_SESSION
+ * 是否启用Http服务
  */
-const ENABLE_SESSION = false;
+const ENABLE_HTTP = true;

@@ -47,6 +47,11 @@ class Server {
      */
     protected $_on_stop;
     /**
+     * 用户自定义onMessage回调
+     * @var callable
+     */
+    protected $_on_message;
+    /**
      * 服务名
      * @var string
      */
@@ -75,15 +80,14 @@ class Server {
      * 构造函数
      *
      * @param string $name
-     * @param string $protocol
-     * @param int|null $port
-     * @param array $ssl
+     * @param string|null $listen
+     * @param array|null $ssl
      */
-    protected function __construct(string $name, string $protocol, ?int $port, array $ssl = null) {
+    protected function __construct(string $name, ?string $listen, ?array $ssl) {
         $this->_name = $name;
-        $this->_listen = isset($port);
+        $this->_listen = isset($listen);
         $this->_worker = new Worker(
-            $this->_listen ? $protocol.'://[::]:'.$port : '',
+            $this->_listen ? $listen : '',
             $ssl ? ['ssl' => $ssl] : []
         );
         if ($ssl)
@@ -151,20 +155,17 @@ class Server {
             return;
         }
         switch ($event) {
-            case 'start':
+            case 'Start':
                 $this->_on_start = $callback;
                 break;
-            case 'stop':
+            case 'Stop':
                 $this->_on_stop = $callback;
                 break;
-            case 'bufferFull':
-                $this->_worker->onBufferFull = $callback;
-                break;
-            case 'bufferDrain':
-                $this->_worker->onBufferDrain = $callback;
+            case 'Message':
+                $this->_on_message = $callback;
                 break;
             default:
-                Console::warning("Unsupported event \"$event\".");
+                $this->_worker->${'on'.$event} = $callback;
         }
     }
     /**

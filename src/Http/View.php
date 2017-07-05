@@ -29,7 +29,7 @@ abstract class View extends \Acast\View {
      */
     static function json(array $data, int $err = 0) {
         Http::header('Content-Type: application/json');
-        return json_encode(['err' => $err] + $data);
+        return parent::json($data, $err);
     }
     /**
      * 将视图回传给控制器

@@ -88,7 +88,7 @@ Router::instance('demo')->add(['new'], 'GET', function () {
 
 3. `$this->retMsg`: 路由回调结束后返回给用户的数据。\(仅在HTTP环境下有效\)
 
-4. `$this->connection`: 与客户端的连接实例。一般用于在输入中间件中直接输出错误信息并关闭连接。\(仅在HTTP环境下有效\)不建议在路由回调或输出中间件中使用。由于关闭连接的操作是异步的，因此调用$this-\>connection-\>close\(\)时后应直接返回false，否则可能出现不可预料的错误。
+4. `$this->connection`: 与客户端的连接实例。在HTTP环境下不建议直接使用。
 
 5. `$this->method`: HTTP请求的方法。非HTTP环境可以自定义该参数的获取方式。
 

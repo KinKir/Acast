@@ -12,6 +12,8 @@
 
 3. 基于`Workerman`提供服务，高并发，性能高于`PHP-FPM`。
 
+4. 支持长连接应用。
+
 #### 依赖
 
 1. `Acast`依赖[Workerman](http://www.workerman.net/)提供HTTP服务。需要在项目中包含最新的`Workerman`源码。

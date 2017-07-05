@@ -24,6 +24,32 @@
 
 $controllers的格式同`Router::bind()`，但是不可以省略别名。
 
+### 适用于Acast\\Socket的成员函数
+
+> protected function Controller::lock(callable $callback) void
+
+锁定客户端。此方法被调用后，用户的所有请求都将传递给指定的回调函数，而非路由。
+
+> protected function Controller::unlock() void
+
+解锁客户端。
+
+> protected function Controller::getSession(mixed $key) mixed
+
+获取指定的`$key`对应的当前客户端连接的session。
+
+> protected function Controller::setSession($key, $value = null) void
+
+以指定的`$key`和`$value`设置当前客户端连接的session。
+
+> function Controller::send($data, bool $raw = false)
+
+向客户端发送数据。若`$raw`为true，则数据不会被对应协议的`encode()`方法处理。
+
+> function Controller::close($data = null, bool $raw = false)
+
+发送数据后关闭连接。
+
 ### 成员变量
 
 1. `$this->params`: 拷贝自路由实例。

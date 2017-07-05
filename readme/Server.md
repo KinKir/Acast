@@ -44,9 +44,17 @@ Server::create('demo', 443, [
 
 `Acast`服务提供者的事件是对`Workerman`事件的一个封装，要求用户传递事件类型及回调函数，并交由`Workerman`处理。调用回调函数时会传递对应`Worker`实例。
 
-当前支持的事件有："start", "stop", "bufferFull", "bufferDrain"。如果使用WebSocket协议，则额外支持"handshake"事件。
+其中，`WorkerStart`回调会在当前服务的每个进程启动时被调用，同理，`WorkerStop`回调是在每个进程正常终止时被调用。
 
-其中，start回调会在当前服务的每个进程启动时被调用，同理，stop回调是在每个进程正常终止时被调用。
+在Acast\Socket下，支持Start，Stop和Message回调，其中Start和Stop回调分别在连接建立和连接关闭时被调用，而Message回调用于确定请求方法和路由。其示例如下：
+
+```php
+Server::app('Demo')->event('Message', function ($connection, $data, &$path, &$method) {
+    $path = $data['path'];
+    $method = $data['method'];
+    return $data['data'];
+});
+```
 
 ### Worker配置
 

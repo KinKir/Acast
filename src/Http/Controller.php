@@ -9,7 +9,7 @@ abstract class Controller extends \Acast\Controller {
      */
     public $retMsg;
     /**
-     * 构造函数，绑定模型、视图
+     * 构造函数
      *
      * @param Router $router
      */

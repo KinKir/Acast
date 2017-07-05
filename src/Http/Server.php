@@ -21,12 +21,11 @@ class Server extends \Acast\Server {
      * 构造函数
      *
      * @param string $name
-     * @param string $protocol
-     * @param int|null $port
-     * @param array $ssl
+     * @param string|null $listen
+     * @param array|null $ssl
      */
-    protected function __construct(string $name, string $protocol, ?int $port, array $ssl = null) {
-        parent::__construct($name, $protocol, $port, $ssl);
+    protected function __construct(string $name, ?string $listen, ?array $ssl) {
+        parent::__construct($name, $listen, $ssl);
         $this->workerConfig(DEFAULT_WORKER_CONFIG);
     }
     /**
@@ -38,7 +37,7 @@ class Server extends \Acast\Server {
      */
     static function create(string $app, ?string $listen = null, ?array $ssl = null) {
         parent::create($app);
-        self::$_apps[$app] = new self($app, 'http', $listen, $ssl);
+        self::$_apps[$app] = new self($app, $listen ? 'http://'.$listen : null, $ssl);
     }
     /**
      * 收到请求回调

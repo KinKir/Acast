@@ -49,6 +49,16 @@ abstract class View {
             self::$_templates[$name] = $data;
     }
     /**
+     * 格式化为JSON
+     *
+     * @param array $data
+     * @param int $err
+     * @return string
+     */
+    static function json(array $data, int $err = 0) {
+        return json_encode(['err' => $err] + $data);
+    }
+    /**
      * 获取视图
      *
      * @param string $name
@@ -65,4 +75,9 @@ abstract class View {
             $this->_temp = self::$_templates[$name];
         return $this;
     }
+    /**
+     * 输出视图
+     * @return mixed
+     */
+    abstract function show();
 }

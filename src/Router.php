@@ -1,7 +1,9 @@
 <?php
 
 namespace Acast;
-use Workerman\Worker;
+use Workerman\ {
+    Worker, Connection\TcpConnection
+};
 
 /**
  * 路由
@@ -78,6 +80,11 @@ class Router {
      * @var string
      */
     public $rawRequest;
+    /**
+     * 连接实例
+     * @var TcpConnection
+     */
+    public $connection;
     /**
      * 构造函数
      */
@@ -260,7 +267,10 @@ class Router {
      *
      * @return bool
      */
-    protected function _routerCall() : bool {
+    private function _routerCall() : bool {
+        $status = $this->connection->getStatus();
+        if ($status === TcpConnection::STATUS_CLOSING || $status === TcpConnection::STATUS_CLOSED)
+            return false;
         $callback = $this->_pCall[self::_CALLBACK];
         try {
             return $callback() ?? true;

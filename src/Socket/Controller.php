@@ -36,6 +36,6 @@ abstract class Controller extends \Acast\Controller {
         return $this->_router->connection->send($data, $raw);
     }
     function close($data = null, bool $raw = false) {
-        return $this->_router->connection->close($data, $raw);
+        $this->_router->connection->close($data, $raw);
     }
 }

@@ -13,3 +13,7 @@ const DEBUG_MODE = false;
  * 是否启用Http服务
  */
 const ENABLE_HTTP = true;
+/**
+ * 是否启用Socket服务
+ */
+const ENABLE_SOCKET = true;

@@ -28,3 +28,7 @@ if (ENABLE_HTTP) {
     foreach (glob(__DIR__.'/src/Http/*.php') as $require_file)
         require_once $require_file;
 }
+if (ENABLE_SOCKET) {
+    foreach (glob(__DIR__.'/src/Socket/*.php') as $require_file)
+        require_once $require_file;
+}

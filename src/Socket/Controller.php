@@ -2,7 +2,6 @@
 
 namespace Acast\Socket;
 
-
 abstract class Controller extends \Acast\Controller {
     /**
      * 当前绑定的路由实例

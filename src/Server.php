@@ -155,10 +155,10 @@ class Server {
             return;
         }
         switch ($event) {
-            case 'Start':
+            case 'WorkerStart':
                 $this->_on_start = $callback;
                 break;
-            case 'Stop':
+            case 'WorkerStop':
                 $this->_on_stop = $callback;
                 break;
             case 'Message':

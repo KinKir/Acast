@@ -165,7 +165,7 @@ class Server {
                 $this->_on_message = $callback;
                 break;
             default:
-                $this->_worker->${'on'.$event} = $callback;
+                $this->_worker->{'on'.$event} = $callback;
         }
     }
     /**

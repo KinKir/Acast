@@ -8,7 +8,7 @@
 
 事实上，每一个服务提供者是对一个`Workerman`的`Worker`实例的封装。和`Acast`框架的所有其他组件一样，它位于`Acast`命名空间下。
 
-`$listen`为服务监听的端口。根据服务类型的不同，服务所使用的协议也不同。`Acast\Http`主要提供HTTP协议，而`Acast\Socket`提供各种基于TCP长连接的协议，包括Webocket。
+`$listen`为服务监听的端口。根据服务类型的不同，服务所使用的协议也不同。`Acast\Http`主要提供HTTP协议，而`Acast\Socket`提供各种基于TCP长连接的协议，包括WebSocket。
 
 如果需要提供HTTPS或WSS服务，`$ssl`格式应满足以下示例中格式，否则为空：
 

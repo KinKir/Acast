@@ -53,7 +53,6 @@ class Event implements EventInterface
     
     /**
      * construct
-     * @return void
      */
     public function __construct()
     {
@@ -63,14 +62,14 @@ class Event implements EventInterface
     /**
      * @see EventInterface::add()
      */
-    public function add($fd, $flag, $func, $args=[])
+    public function add($fd, $flag, $func, $args = [])
     {
         switch ($flag) {
             case self::EV_SIGNAL:
 
                 $fd_key = (int)$fd;
                 $event = \Event::signal($this->_eventBase, $fd, $func);
-                if (!$event||!$event->add()) {
+                if (!$event || !$event->add()) {
                     return false;
                 }
                 $this->_eventSignal[$fd_key] = $event;
@@ -142,7 +141,7 @@ class Event implements EventInterface
      * Timer callback.
      * @param null $fd
      * @param int $what
-     * @param int $timer_id
+     * @param int $param
      */
     public function timerCallback($fd, $what, $param)
     {

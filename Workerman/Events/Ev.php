@@ -52,7 +52,7 @@ class Ev implements EventInterface
      * Add a timer.
      * {@inheritdoc}
      */
-    public function add($fd, $flag, $func, $args = null)
+    public function add($fd, $flag, $func, $args = [])
     {
         $callback = function ($event, $socket) use ($fd, $func) {
             try {

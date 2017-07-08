@@ -17,3 +17,7 @@ const ENABLE_HTTP = true;
  * 是否启用Socket服务
  */
 const ENABLE_SOCKET = true;
+/**
+ * 是否启用GatewayWorker
+ */
+const ENABLE_GATEWAY_WORKER = true;

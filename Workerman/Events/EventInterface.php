@@ -59,7 +59,7 @@ interface EventInterface
      * @param mixed    $args
      * @return bool
      */
-    public function add($fd, $flag, $func, $args = null);
+    public function add($fd, $flag, $func, $args = []);
 
     /**
      * Remove event listener from event loop.

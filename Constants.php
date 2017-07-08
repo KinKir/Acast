@@ -18,6 +18,6 @@ const ENABLE_HTTP = true;
  */
 const ENABLE_SOCKET = true;
 /**
- * 是否启用GatewayWorker
+ * 是否启用加强型Socket服务
  */
-const ENABLE_GATEWAY_WORKER = true;
+const ENABLE_ENHANCED_SOCKET = true;

@@ -82,19 +82,17 @@ class Server {
      * @param string $name
      * @param string|null $listen
      * @param array|null $ssl
+     * @param string $class
      */
-    protected function __construct(string $name, ?string $listen, ?array $ssl) {
+    protected function __construct(string $name, ?string $listen, ?array $ssl, string $class = Worker::class) {
         $this->_name = $name;
         $this->_listen = isset($listen);
-        $this->_worker = new Worker(
+        $this->_worker = new $class(
             $this->_listen ? $listen : '',
             $ssl ? ['ssl' => $ssl] : []
         );
         if ($ssl)
             $this->_worker->transport = 'ssl';
-        $this->_worker->onWorkerStart = [$this, 'onServerStart'];
-        $this->_worker->onWorkerStop = [$this, 'onServerStop'];
-        $this->_worker->onMessage = [$this, 'onMessage'];
     }
     /**
      * 配置Workerman
@@ -128,16 +126,6 @@ class Server {
         }
         if (isset(self::$_apps[$app]))
             Console::fatal("Failed to create app. App \"$app\" exists!");
-    }
-    /**
-     * 收到请求回调
-     *
-     * @param TcpConnection $connection
-     * @param string $data
-     */
-    function onMessage(TcpConnection $connection, $data) {
-        $this->_router->connection = $this->_connection = $connection;
-        $this->_router->rawRequest = $data;
     }
     /**
      * 绑定事件回调
@@ -190,7 +178,6 @@ class Server {
     function onServerStart(Worker $worker) {
         self::$name = $this->_name;
         self::$memcached = new \Memcached();
-        pcntl_signal(SIGCHLD, SIG_IGN); //将子进程转交给内核，防止僵尸进程。
         if (is_callable($this->_on_start))
             call_user_func($this->_on_start, $worker);
         self::$_status = self::_STATUS_STARTED;
@@ -221,28 +208,6 @@ class Server {
         if (is_callable($callback))
             $callback();
         Worker::runAll();
-    }
-    /**
-     * 在当前位置创建一个子进程，并执行回调。
-     *
-     * @param callable $callback
-     * @param mixed $params
-     * @return int;
-     */
-    static function async(callable $callback, $params = null) {
-        if (!is_callable($callback)) {
-            Console::warning('Callback function not callable.');
-            return 0;
-        }
-        $pid = pcntl_fork();
-        if ($pid == 0) {
-            if (!is_array($params))
-                $params = [$params];
-            call_user_func_array($callback, $params);
-            Worker::$status = Worker::STATUS_SHUTDOWN;
-            exit(0);
-        }
-        return $pid;
     }
     /**
      * 获取运行状态

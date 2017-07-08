@@ -47,11 +47,11 @@ class BusinessWorker extends Worker
     public $registerAddress = '127.0.0.1:1236';
 
     /**
-     * 事件处理类，默认是 Event 类
+     * 事件处理类实例
      *
      * @var string
      */
-    public $eventHandler = 'Events';
+    public $eventHandler = null;
 
     /**
      * 业务超时时间，可用来定位程序卡在哪里
@@ -208,10 +208,6 @@ class BusinessWorker extends Worker
         if ($this->_onWorkerStart) {
             call_user_func($this->_onWorkerStart, $this);
         }
-        
-        if (is_callable($this->eventHandler . '::onWorkerStart')) {
-            call_user_func($this->eventHandler . '::onWorkerStart', $this);
-        }
 
         if (function_exists('pcntl_signal')) {
             // 业务超时信号处理
@@ -221,19 +217,11 @@ class BusinessWorker extends Worker
         }
 
         // 设置回调
-        if (is_callable($this->eventHandler . '::onConnect')) {
-            $this->_eventOnConnect = $this->eventHandler . '::onConnect';
-        }
+        $this->_eventOnConnect = [$this->eventHandler, 'onConnect'];
 
-        if (is_callable($this->eventHandler . '::onMessage')) {
-            $this->_eventOnMessage = $this->eventHandler . '::onMessage';
-        } else {
-            echo "Waring: {$this->eventHandler}::onMessage is not callable\n";
-        }
+        $this->_eventOnMessage = [$this->eventHandler, 'onMessage'];
 
-        if (is_callable($this->eventHandler . '::onClose')) {
-            $this->_eventOnClose = $this->eventHandler . '::onClose';
-        }
+        $this->_eventOnClose = [$this->eventHandler, 'onClose'];
 
         // 如果Register服务器不在本地服务器，则需要保持心跳
         if (strpos($this->registerAddress, '127.0.0.1') !== 0) {
@@ -267,9 +255,6 @@ class BusinessWorker extends Worker
     {
         if ($this->_onWorkerStop) {
             call_user_func($this->_onWorkerStop, $this);
-        }
-        if (is_callable($this->eventHandler . '::onWorkerStop')) {
-            call_user_func($this->eventHandler . '::onWorkerStop', $this);
         }
     }
 

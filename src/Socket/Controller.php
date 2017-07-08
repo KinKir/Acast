@@ -72,7 +72,7 @@ abstract class Controller extends \Acast\Controller {
     /**
      * 向客户端发送数据并关闭连接
      *
-     * @param null $data
+     * @param mixed $data
      * @param bool $raw
      */
     function close($data = null, bool $raw = false) {

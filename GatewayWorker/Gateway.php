@@ -536,10 +536,10 @@ class Gateway extends Worker
                 // 在一台服务器上businessWorker->name不能相同
                 if (isset($this->_workerConnections[$key])) {
                     self::log("Gateway: Worker->name conflict. Key:{$key}");
-		    $connection->close();
+                    $connection->close();
                     return;
                 }
-		$connection->key = $key;
+                $connection->key = $key;
                 $this->_workerConnections[$key] = $connection;
                 $connection->authorized = true;
                 return;

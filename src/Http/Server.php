@@ -26,6 +26,9 @@ class Server extends \Acast\Server {
      */
     protected function __construct(string $name, ?string $listen, ?array $ssl) {
         parent::__construct($name, $listen, $ssl);
+        $this->_worker->onWorkerStart = [$this, 'onServerStart'];
+        $this->_worker->onWorkerStop = [$this, 'onServerStop'];
+        $this->_worker->onMessage = [$this, 'onMessage'];
         $this->workerConfig(DEFAULT_WORKER_CONFIG);
     }
     /**
@@ -46,7 +49,8 @@ class Server extends \Acast\Server {
      * @param string $data
      */
     function onMessage(TcpConnection $connection, $data) {
-        parent::onMessage($connection, $data);
+        $this->_router->connection = $this->_connection = $connection;
+        $this->_router->rawRequest = $data;
         $connection->forward = false;
         $path = explode('/', substr(explode('?', $_SERVER['REQUEST_URI'], 2)[0], 1));
         if (empty($path[0]) && count($path) == 1)

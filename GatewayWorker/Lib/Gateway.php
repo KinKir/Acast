@@ -61,6 +61,7 @@ class Gateway
      * @param array  $client_id_array   客户端 id 数组
      * @param array  $exclude_client_id 不给这些client_id发
      * @param bool   $raw               是否发送原始数据（即不调用gateway的协议的encode方法）
+     * @throws Exception
      * @return void
      */
     public static function sendToAll($message, $client_id_array = null, $exclude_client_id = null, $raw = false)

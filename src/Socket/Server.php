@@ -20,7 +20,8 @@ class Server extends \Acast\Server {
      * @param string $data
      */
     function onMessage(TcpConnection $connection, $data) {
-        parent::onMessage($connection, $data);
+        $this->_router->connection = $this->_connection = $connection;
+        $this->_router->rawRequest = $data;
         if (!is_null($callback = $connection->lock)) {
             is_callable($callback) && $callback($connection, $data);
             return;
@@ -50,6 +51,9 @@ class Server extends \Acast\Server {
      */
     function __construct(string $name, ?string $listen, ?array $ssl = null) {
         parent::__construct($name, $listen, $ssl);
+        $this->_worker->onWorkerStart = [$this, 'onServerStart'];
+        $this->_worker->onWorkerStop = [$this, 'onServerStop'];
+        $this->_worker->onMessage = [$this, 'onMessage'];
         $this->workerConfig(DEFAULT_WORKER_CONFIG);
     }
     /**

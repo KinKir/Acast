@@ -92,7 +92,7 @@ Router::instance('demo')->add(['new'], 'GET', function () {
 
 5. `$this->method`: HTTP请求的方法。非HTTP环境可以自定义该参数的获取方式。
 
-6. `$this->rawRequest`: 客户端发来的完整的请求内容。
+6. `$this->requestData`: 客户端发来的请求数据，在`Acast\Http`下，为客户端发来的完整的HTTP请求内容。在`Acast\Socket`下，则由自定义`onMessage`回调的返回值自动设置。
 
 ### 示例
 

@@ -26,7 +26,7 @@
 
 `View::fetch()`方法取出的视图将保存到局部变量`$this->_temp`中，可以对其进一步处理。
 
-`View::show()`方法将其回传到控制器的`retMsg`中。\(仅在HTTP环境下有效\)
+`View::show()`方法在不同环境下行为不同。如在`Acast\Http`下，该方法会将`$this->_temp`赋值给控制器的`$this->retMsg`，在`Acast\Socket`下，则将其发送给客户端。
 
 如：
 

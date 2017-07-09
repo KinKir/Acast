@@ -76,10 +76,10 @@ class Router {
      */
     public $method;
     /**
-     * 完整HTTP请求内容
+     * 请求内容
      * @var string
      */
-    public $rawRequest;
+    public $requestData;
     /**
      * 连接实例
      * @var TcpConnection
@@ -267,10 +267,7 @@ class Router {
      *
      * @return bool
      */
-    private function _routerCall() : bool {
-        $status = $this->connection->getStatus();
-        if ($status === TcpConnection::STATUS_CLOSING || $status === TcpConnection::STATUS_CLOSED)
-            return false;
+    protected function _routerCall() : bool {
         $callback = $this->_pCall[self::_CALLBACK];
         try {
             return $callback() ?? true;

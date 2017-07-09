@@ -2,12 +2,9 @@
 
 namespace Acast\Socket;
 
+use Workerman\Connection\TcpConnection;
+
 class Router extends \Acast\Router {
-    /**
-     * 请求内容
-     * @var mixed
-     */
-    public $requestData;
     /**
      * 默认请求方法
      */
@@ -17,8 +14,8 @@ class Router extends \Acast\Router {
      *
      * @param callable|null $callback
      */
-    protected function lock(?callable $callback = null) {
-        $this->connection->lock = $callback;
+    protected function lock(callable $callback = null) {
+        $this->connection->lock = $callback ?? true;
     }
     /**
      * 解锁客户端
@@ -45,6 +42,17 @@ class Router extends \Acast\Router {
         if (isset($value))
             $this->connection->session[$key] = $value;
         else unset($this->connection->session[$key]);
+    }
+    /**
+     * 调用路由回调
+     *
+     * @return bool
+     */
+    protected function _routerCall() : bool {
+        $status = $this->connection->getStatus();
+        if ($status === TcpConnection::STATUS_CLOSING || $status === TcpConnection::STATUS_CLOSED)
+            return false;
+        return parent::_routerCall();
     }
     /**
      * 创建路由实例

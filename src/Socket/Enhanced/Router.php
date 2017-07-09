@@ -4,28 +4,14 @@ namespace Acast\Socket\Enhanced;
 
 class Router extends \Acast\Router {
     /**
-     * 请求内容
-     * @var mixed
+     * 当前客户端连接的ID
+     * @var string
      */
-    public $requestData;
+    public $client_id;
     /**
      * 默认请求方法
      */
     const DEFAULT_METHOD = '.';
-    /**
-     * 锁定客户端
-     *
-     * @param callable|null $callback
-     */
-    protected function lock(?callable $callback = null) {
-        $_SESSION['lock'] = $callback;
-    }
-    /**
-     * 解锁客户端
-     */
-    protected function unlock() {
-        unset($_SESSION['lock']);
-    }
     /**
      * 创建路由实例
      * @param string $name

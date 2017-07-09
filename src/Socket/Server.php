@@ -21,7 +21,6 @@ class Server extends \Acast\Server {
      */
     function onMessage(TcpConnection $connection, $data) {
         $this->_router->connection = $this->_connection = $connection;
-        $this->_router->rawRequest = $data;
         if (!is_null($callback = $connection->lock)) {
             is_callable($callback) && $callback($connection, $data);
             return;
@@ -29,8 +28,7 @@ class Server extends \Acast\Server {
         $path = $method = null;
         if (is_callable($callback = $this->_on_message))
             $this->_router->requestData = $callback($connection, $data, $path, $method);
-        if (!$this->_router->locate($path ?? [], $method ?? Router::DEFAULT_METHOD))
-            $connection->close('Bad request.');
+        $this->_router->locate($path ?? [], $method ?? Router::DEFAULT_METHOD);
     }
     /**
      * 服务停止回调

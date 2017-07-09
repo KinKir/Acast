@@ -86,13 +86,3 @@ Server::app('Demo')->config([
 `$callback`回调将会在`Worker`即将被启动之前被调用。
 
 否则，调用`Worker::runAll()`方法，交由`Workerman`处理命令行参数。
-
-## 异步操作
-
-> static function Server::async(callable $callback, mixed $param = null) void
-
-创建一个子进程，并在子进程中执行回调函数，执行完成后，子进程会立即退出。
-
-`$param`为回调函数的参数。如果有多个参数，以数组形式传入。
-
-该静态方法在调用后会立即返回，返回值为子进程pid。

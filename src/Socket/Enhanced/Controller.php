@@ -6,10 +6,10 @@ use GatewayWorker\Lib\Gateway;
 
 abstract class Controller extends \Acast\Controller {
     /**
-     * 当前绑定的路由实例
-     * @var Router
+     * 当前连接的客户端ID
+     * @var string
      */
-    private $_router;
+    protected $_client_id;
     /**
      * 构造函数，绑定模型、视图
      *
@@ -17,29 +17,21 @@ abstract class Controller extends \Acast\Controller {
      */
     function __construct(Router $router) {
         parent::__construct($router);
-        $this->_router = $router;
+        $this->_client_id = $router->client_id;
     }
     /**
      * 锁定客户端
      *
      * @param callable|null $callback
      */
-    protected function _lock(?callable $callback = null) {
-        $_SESSION['lock'] = $callback;
+    static function lock(?callable $callback = null) {
+        $_SESSION['lock'] = $callback ?? true;
     }
     /**
      * 解锁客户端
      */
-    protected function _unlock() {
+    static function unlock() {
         unset($_SESSION['lock']);
-    }
-    /**
-     * 获取当前客户端连接的实例
-     *
-     * @return \Workerman\Connection\TcpConnection
-     */
-    protected function _getConnection() {
-        return $this->_router->connection;
     }
     /**
      * 向客户端发送数据

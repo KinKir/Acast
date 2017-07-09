@@ -23,7 +23,7 @@ abstract class Controller extends \Acast\Controller {
      * @param callable|null $callback
      */
     protected function _lock(?callable $callback = null) {
-        $this->_router->connection->lock = $callback;
+        $this->_router->connection->lock = $callback ?? true;
     }
     /**
      * 解锁客户端

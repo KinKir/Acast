@@ -32,3 +32,7 @@ if (ENABLE_SOCKET) {
     foreach (glob(__DIR__.'/src/Socket/*.php') as $require_file)
         require_once $require_file;
 }
+if (ENABLE_ENHANCED_SOCKET) {
+    foreach (glob(__DIR__.'/src/Socket/Enhanced/*.php') as $require_file)
+        require_once $require_file;
+}

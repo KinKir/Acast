@@ -5,8 +5,9 @@ namespace Acast\Http;
 use Acast\ {
     Config
 };
-use Workerman\ {
-    Connection\AsyncTcpConnection
+use Workerman\{
+    Connection\AsyncTcpConnection,
+    Connection\TcpConnection
 };
 
 class Router extends \Acast\Router {
@@ -47,7 +48,18 @@ class Router extends \Acast\Router {
             $remote->close();
         };
         $remote->connect();
-        $remote->send($this->rawRequest);
+        $remote->send($this->requestData);
+    }
+    /**
+     * 调用路由回调
+     *
+     * @return bool
+     */
+    protected function _routerCall() : bool {
+        $status = $this->connection->getStatus();
+        if ($status === TcpConnection::STATUS_CLOSING || $status === TcpConnection::STATUS_CLOSED)
+            return false;
+        return parent::_routerCall();
     }
     /**
      * 创建路由实例

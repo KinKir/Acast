@@ -50,7 +50,7 @@ class Server extends \Acast\Server {
      */
     function onMessage(TcpConnection $connection, $data) {
         $this->_router->connection = $this->_connection = $connection;
-        $this->_router->rawRequest = $data;
+        $this->_router->requestData = $data;
         $connection->forward = false;
         $path = explode('/', substr(explode('?', $_SERVER['REQUEST_URI'], 2)[0], 1));
         if (empty($path[0]) && count($path) == 1)

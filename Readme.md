@@ -12,7 +12,7 @@
 
 3. 基于`Workerman`提供服务，高并发，性能高于`PHP-FPM`。
 
-4. 支持长连接应用。
+4. 支持长连接应用。封装了`GatewayWorker`，可以便捷地实现客户端间通信。
 
 #### 依赖
 
@@ -29,7 +29,7 @@
 1. 下载源码。像如下所示将`Acast`包含在你的项目中。
 
 ```php
-require_once __DIR__ . '/Acast/Acast.php';
+require_once __DIR__ . '/Acast/.php';
 ```
 
 2. 使用`Acast`优雅地实现你的业务逻辑。
@@ -119,5 +119,7 @@ Acast的视图可以很好地与[Plates](http://platesphp.com/)等模版兼容�
 有关配置项的详细文档，见[这里](readme/Config.md)
 
 #### 其他
+
+有关`Acast\Socket\Enhanced`对`GatewayWorker`的封装及其使用，见[这里](readme/GatewayWorker.md)。
 
 有关`Acast`的其他功能及使用时的注意事项，见[这里](readme/Misc.md)。

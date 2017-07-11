@@ -159,7 +159,7 @@ class Router {
         return $this;
     }
     /**
-     * 定位路由。该方法在收到HTTP请求后被调用
+     * 定位路由。该方法在收到请求后被调用
      *
      * @param array $path
      * @param string $method

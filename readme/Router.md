@@ -4,9 +4,9 @@
 
 ### 注册路由
 
-> static function Router::create(string $name) void
+> static function Router::create(string $name) Router
 
-根据路由名称创建路由实例。创建的实例可以由以下方法获取：
+根据路由名称创建路由实例。返回新实例。创建的实例也可以由以下方法获取：
 
 > static function Router::instance(string $name) Router
 
@@ -14,7 +14,7 @@
 
 > function Router::add(?array $path, $methods, callable $callback) Router
 
-1. `$path`为Request URI以"/"为分界符分割后的数组。如果是根目录，则为空数组。如果要将数组的某个成员作为参数捕获，则在其之前加"/"。路由匹配成功后，其值将保存到`$this->params`中。例如，`$path`为\['id', '/id', 'name', '/name'\]，且Request URI为"/id/3/name/foo"时，就会得到`$this->params` = \['id => '3', 'name' => 'foo'\]。
+1. 在`Acast\Http`中，`$path`为Request URI以"/"为分界符分割后的数组。如果是根目录，则为空数组。如果要将数组的某个成员作为参数捕获，则在其之前加"/"。路由匹配成功后，其值将保存到`$this->params`中。例如，`$path`为\['id', '/id', 'name', '/name'\]，且Request URI为"/id/3/name/foo"时，就会得到`$this->params` = \['id => '3', 'name' => 'foo'\]。
 
 2. `$methods`为HTTP请求的方法，包括"POST", "GET", "PUT"等。可以传递一个数组，包含所有需要匹配的方法。若当前不处于HTTP环境，则该参数可以根据情况自定义。
 
@@ -68,12 +68,10 @@
 
 > function Router::forward(string $name) void
 
-$name为要转发到的地址的别名，需要在服务启动前使用Config::set\(\)设置，前缀为"FORWARD\_"。
+$name为要转发到的地址的别名，需要在服务启动前使用Config::set\(\)设置，前缀为"FORWARD\_"。例如：
 
 ```php
-Server::config([
-    'FORWARD_NEW' => 'tcp://127.0.0.1:8080'
-]);
+Config::set('FORWARD_NEW', 'tcp://127.0.0.1:8080');
 //...
 Router::instance('demo')->add(['new'], 'GET', function () {
     $this->forward('NEW');

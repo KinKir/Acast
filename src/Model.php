@@ -112,6 +112,21 @@ abstract class Model {
         return $query->query();
     }
     /**
+     * 构造WHERE IN语句
+     *
+     * @param $col
+     * @param array $arr
+     * @return string
+     */
+    protected static function _in($col, array $arr) {
+        $ret = $col.' IN (';
+        if (empty($arr))
+            return $ret . 'null)';
+        foreach ($arr as $val)
+            $ret .= $val.', ';
+        return substr($ret, 0, strrpos($ret, ',')) . ')';
+    }
+    /**
      * 绑定表
      *
      * @param string $table

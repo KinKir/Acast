@@ -57,9 +57,10 @@ class Router extends \Acast\Router {
     /**
      * 创建路由实例
      * @param string $name
+     * @return self
      */
     static function create(string $name) {
         parent::create($name);
-        self::$routers[$name] = new self;
+        return self::$routers[$name] = new self;
     }
 }

@@ -9,9 +9,7 @@ abstract class Controller extends \Acast\Controller {
      */
     public $retMsg;
     /**
-     * 构造函数
-     *
-     * @param Router $router
+     * {@inheritdoc}
      */
     function __construct(Router $router) {
         parent::__construct($router);

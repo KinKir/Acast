@@ -66,10 +66,11 @@ abstract class Model {
      *
      * @param array $cols
      * @param array|null $bind
+     * @param bool $ignore
      * @return mixed
      */
-    protected function _insert(array $cols, ?array $bind = null) {
-        $query = self::Db()->insert($this->_table)->cols($cols);
+    protected function _insert(array $cols, ?array $bind = null, bool $ignore = false) {
+        $query = self::Db()->insert($this->_table)->ignore($ignore)->cols($cols);
         if (isset($bind))
             $query->bindValues($bind);
         return $query->query();

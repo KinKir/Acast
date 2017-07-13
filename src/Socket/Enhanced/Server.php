@@ -98,9 +98,7 @@ class Server extends \Acast\Server {
             call_user_func($this->_on_business_stop, $worker);
     }
     /**
-     * GatewayWorker停止回调
-     *
-     * @param Worker $worker
+     * {@inheritdoc}
      */
     function onServerStop(Worker $worker) {
         parent::onServerStop($worker);
@@ -108,9 +106,7 @@ class Server extends \Acast\Server {
             $connection->close();
     }
     /**
-     * @param string $name
-     * @param null|string $listen
-     * @param array|null $ssl
+     * {@inheritdoc}
      */
     function __construct(string $name, ?string $listen, ?array $ssl = null) {
         if ($listen) {

@@ -44,9 +44,7 @@ class Router extends \Acast\Router {
         else unset($this->connection->session[$key]);
     }
     /**
-     * 调用路由回调
-     *
-     * @return bool
+     * {@inheritdoc}
      */
     protected function _routerCall() : bool {
         $status = $this->connection->getStatus();
@@ -55,9 +53,7 @@ class Router extends \Acast\Router {
         return parent::_routerCall();
     }
     /**
-     * 创建路由实例
-     * @param string $name
-     * @return self
+     * {@inheritdoc}
      */
     static function create(string $name) {
         parent::create($name);

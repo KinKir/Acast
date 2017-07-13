@@ -18,11 +18,7 @@ class Server extends \Acast\Server {
      */
     protected $_router;
     /**
-     * 构造函数
-     *
-     * @param string $name
-     * @param string|null $listen
-     * @param array|null $ssl
+     * {@inheritdoc}
      */
     protected function __construct(string $name, ?string $listen, ?array $ssl) {
         parent::__construct($name, $listen, $ssl);
@@ -43,10 +39,7 @@ class Server extends \Acast\Server {
         self::$_apps[$app] = new self($app, $listen ? 'http://'.$listen : null, $ssl);
     }
     /**
-     * 收到请求回调
-     *
-     * @param TcpConnection $connection
-     * @param string $data
+     * {@inheritdoc}
      */
     function onMessage(TcpConnection $connection, $data) {
         $this->_router->connection = $this->_connection = $connection;
@@ -64,9 +57,7 @@ class Server extends \Acast\Server {
         $connection->send($this->_router->retMsg ?? '');
     }
     /**
-     * 服务启动回调
-     *
-     * @param Worker $worker
+     * {@inheritdoc}
      */
     function onServerStart(Worker $worker){
         parent::onServerStart($worker);
@@ -74,9 +65,7 @@ class Server extends \Acast\Server {
             Console::warning("No router bound to server \"$this->_name\".");
     }
     /**
-     * 启动所有服务
-     *
-     * @param callable|null $callback
+     * {@inheritdoc}
      */
     static function start(?callable $callback = null) {
         parent::start(function () use ($callback) {

@@ -61,7 +61,7 @@ abstract class Controller {
      */
     protected function invoke(string $name) : ?Model {
         $class = Server::$name.'\\Model\\'.$name;
-        return new $class($this->view);
+        return new $class;
     }
     /**
      * 添加全局控制器绑定

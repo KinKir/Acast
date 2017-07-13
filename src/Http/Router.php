@@ -22,11 +22,7 @@ class Router extends \Acast\Router {
      */
     protected $_object;
     /**
-     * 调用已注册的控制器中的方法
-     *
-     * @param string|int $name
-     * @param mixed $param
-     * @return mixed
+     * {@inheritdoc}
      */
     protected function invoke($name = 0, $param = null) {
         $ret = parent::invoke($name, $param);
@@ -51,9 +47,7 @@ class Router extends \Acast\Router {
         $remote->send($this->requestData);
     }
     /**
-     * 调用路由回调
-     *
-     * @return bool
+     * {@inheritdoc}
      */
     protected function _routerCall() : bool {
         $status = $this->connection->getStatus();
@@ -62,9 +56,7 @@ class Router extends \Acast\Router {
         return parent::_routerCall();
     }
     /**
-     * 创建路由实例
-     * @param string $name
-     * @return self
+     * {@inheritdoc}
      */
     static function create(string $name) : self {
         parent::create($name);

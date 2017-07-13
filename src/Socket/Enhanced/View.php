@@ -8,7 +8,7 @@ abstract class View extends \Acast\View {
      */
     protected $_controller;
     /**
-     * 将视图回传给控制器
+     * {@inheritdoc}
      */
     function show() {
         return $this->_temp;

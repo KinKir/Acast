@@ -21,18 +21,14 @@ abstract class View extends \Acast\View {
         return $msg;
     }
     /**
-     * 格式化为JSON
-     *
-     * @param array $data
-     * @param int $err
-     * @return string
+     * {@inheritdoc}
      */
     static function json(array $data, int $err = 0) {
         Http::header('Content-Type: application/json');
         return parent::json($data, $err);
     }
     /**
-     * 将视图回传给控制器
+     * {@inheritdoc}
      */
     function show() {
         $this->_controller->retMsg = $this->_temp;

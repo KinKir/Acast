@@ -13,9 +13,7 @@ class Router extends \Acast\Router {
      */
     const DEFAULT_METHOD = '.';
     /**
-     * 创建路由实例
-     * @param string $name
-     * @return self
+     * {@inheritdoc}
      */
     static function create(string $name) : self {
         parent::create($name);

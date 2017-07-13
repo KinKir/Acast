@@ -14,10 +14,7 @@ class Server extends \Acast\Server {
      */
     protected $_router;
     /**
-     * 收到请求回调
-     *
-     * @param TcpConnection $connection
-     * @param string $data
+     * {@inheritdoc}
      */
     function onMessage(TcpConnection $connection, $data) {
         $this->_router->connection = $this->_connection = $connection;
@@ -31,9 +28,7 @@ class Server extends \Acast\Server {
         $this->_router->locate($path ?? [], $method ?? Router::DEFAULT_METHOD);
     }
     /**
-     * 服务停止回调
-     *
-     * @param Worker $worker
+     * {@inheritdoc}
      */
     function onServerStop(Worker $worker) {
         parent::onServerStop($worker);
@@ -41,11 +36,7 @@ class Server extends \Acast\Server {
             $connection->close();
     }
     /**
-     * 构造函数
-     *
-     * @param string $name
-     * @param null|string $listen
-     * @param array|null $ssl
+     * {@inheritdoc}
      */
     function __construct(string $name, ?string $listen, ?array $ssl = null) {
         parent::__construct($name, $listen, $ssl);

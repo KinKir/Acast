@@ -1,6 +1,6 @@
 ## Readme
 
-`Acast`是一个轻量级的Web框架。
+Acast是一个轻量级的Web框架。
 
 ### 简介
 
@@ -10,33 +10,35 @@
 
 2. 支持HTTPS、异步处理、定时任务、TCP转发等。
 
-3. 基于`Workerman`提供服务，高并发，性能高于`PHP-FPM`。
+3. 基于Workerman提供服务，高并发，性能高于PHP-FPM。
 
-4. 支持长连接应用。封装了`GatewayWorker`，可以便捷地实现客户端间通信。
+4. 支持长连接应用。封装了GatewayWorker，可以便捷地实现客户端间通信。
+
+5. 即将加入对[Amp](http://amphp.org/)的支持，可以在项目中使用Amp的高性能异步I/O组件。
 
 #### 依赖
 
-1. `Acast`依赖[Workerman](http://www.workerman.net/)提供HTTP服务。需要在项目中包含最新的`Workerman`源码。
+1. Acast依赖[Workerman](http://www.workerman.net/)提供HTTP服务。需要在项目中包含最新的Workerman源码。
 
-2. `Acast`和`Workerman`依赖PHP的一些扩展，包括`pcntl`、`posix`和`memcached`。这意味着你无法在Windows上使用本框架。
+2. Acast和Workerman依赖PHP的一些扩展，包括pcntl、posix和memcached。某些特性，如posix threads，是Linux独有的。这意味着你无法在Windows上使用本框架。
 
 3. 你或许需要考虑安装[event扩展](https://pecl.php.net/package/event)来提高`Workerman`的性能。
 
-4. `Acast`框架依赖较新版本的PHP(7.1.0及以上)，这是由于该框架对`nullable`和`Closure::fromCallable()`等新功能的使用。
+4. Acast框架依赖较新版本的PHP(7.1.0及以上)，这是由于该框架对nullable和`Closure::fromCallable()`等特性的使用。
 
 #### 使用Acast框架
 
-1. 下载源码。像如下所示将`Acast`包含在你的项目中。
+1. 下载源码。像如下所示将Acast包含在你的项目中。
 
 ```php
 require_once __DIR__ . '/Acast/.php';
 ```
 
-2. 使用`Acast`优雅地实现你的业务逻辑。
+2. 使用Acast优雅地实现你的业务逻辑。
 
-3. 配置`Nginx`的端口转发、SSL等。
+3. 配置Nginx的端口转发、SSL等。
 
-4. 像如下所示，在`PHP-CLI`中执行你的项目的入口文件。至此，服务已经启动。
+4. 像如下所示，在PHP-CLI中执行你的项目的入口文件。至此，服务已经启动。
 
 ```bash
 php /Applications/main.php start -d
@@ -86,7 +88,7 @@ php /Applications/main.php start -d
 
 #### 视图
 
-视图主要用于格式化输出数据。支持`Memcached`。
+视图主要用于格式化输出数据。支持Memcached。
 
 它也可以用于预先将本地的静态文件缓存到内存，在需要时快速地取出。
 
@@ -96,15 +98,15 @@ Acast的视图可以很好地与[Plates](http://platesphp.com/)等模版兼容�
 
 #### 计划任务
 
-使用`Workerman`的定时器可以实现基本的计划任务。
+使用Workerman的定时器可以实现基本的计划任务。
 
-此外，`Acast`提供了一个对`Workerman`定时器的封装，用于对时间精确性要求不高的计划任务。
+此外，Acast提供了一个对Workerman定时器的封装，用于对时间精确性要求不高的计划任务。
 
 有关计划任务的详细文档，见[这里](readme/Cron.md)。
 
 #### 迁移
 
-这里迁移指数据库迁移。目前，`Acast`支持格式化并执行指定SQL模版的方式实现数据库的初始化。
+这里迁移指数据库迁移。目前，Acast支持格式化并执行指定SQL模版的方式实现数据库的初始化。
 
 以后可能将加入数据导出功能。
 
@@ -112,7 +114,7 @@ Acast的视图可以很好地与[Plates](http://platesphp.com/)等模版兼容�
 
 #### 配置
 
-`Acast`提供了一个全局变量的简单封装，便于进行项目的相关配置参数的设置和获取。
+Acast提供了一个全局变量的简单封装，便于进行项目的相关配置参数的设置和获取。
 
 配置项可以作用于当前进程，也可以多进程间共享。
 
@@ -120,6 +122,6 @@ Acast的视图可以很好地与[Plates](http://platesphp.com/)等模版兼容�
 
 #### 其他
 
-有关`Acast\Socket\Enhanced`对`GatewayWorker`的封装及其使用，见[这里](readme/GatewayWorker.md)。
+有关`Acast\Socket\Enhanced`对GatewayWorker的封装及其使用，见[这里](readme/GatewayWorker.md)。
 
-有关`Acast`的其他功能及使用时的注意事项，见[这里](readme/Misc.md)。
+有关Acast的其他功能及使用时的注意事项，见[这里](readme/Misc.md)。

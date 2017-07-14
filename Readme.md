@@ -22,7 +22,7 @@ Acast是一个轻量级的Web框架。
 
 2. Acast和Workerman依赖PHP的一些扩展，包括pcntl、posix和memcached。某些特性，如posix threads，是Linux独有的。这意味着你无法在Windows上使用本框架。
 
-3. 你或许需要考虑安装[event扩展](https://pecl.php.net/package/event)来提高`Workerman`的性能。
+3. 你或许需要考虑安装[vent扩展](https://pecl.php.net/package/event)来提高Workerman的性能。
 
 4. Acast框架依赖较新版本的PHP(7.1.0及以上)，这是由于该框架对nullable和`Closure::fromCallable()`等特性的使用。
 

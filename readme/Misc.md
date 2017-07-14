@@ -30,7 +30,7 @@ php main.php clear user room
 sudo service memcached start
 ```
 
-并在Workerman的start事件中连接Memcached server，方可使用。
+并在Workerman的onWorkerStart事件中连接Memcached服务器，方可使用。
 
 ### $_SESSION
 

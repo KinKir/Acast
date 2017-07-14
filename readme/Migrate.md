@@ -9,7 +9,7 @@
 新建一个Migrate实例。
 
 1. `$name`为实例名称。
-2. `$settings`为连接配置（格式与`Model`相同，但不指定`dbname`）。
+2. `$settings`为连接配置（格式与Model相同，但不指定"dbname"）。
 3. `$sql_path`为待执行的SQL文件的路径。
 
 ### 获取Migrate实例

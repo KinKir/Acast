@@ -2,7 +2,8 @@
 
 namespace Acast;
 use Workerman\ {
-    Worker, Connection\TcpConnection
+    Worker, Connection\TcpConnection,
+    Connection\AsyncTcpConnection
 };
 
 /**
@@ -281,6 +282,16 @@ class Router {
      */
     protected function delay() {
         $this->_delayed = true;
+    }
+    /**
+     * 转发请求
+     *
+     * @param string $name
+     */
+    protected function forward(string $name) {
+        $this->connection->forward = true;
+        if (!isset($this->connection->remotes[$name]))
+            $this->connection->remotes[$name] = new AsyncTcpConnection(Config::get('FORWARD_'.$name));
     }
     /**
      * 路由别名，用于实现分发

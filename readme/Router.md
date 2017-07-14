@@ -14,7 +14,7 @@
 
 > function Router::add(?array $path, $methods, callable $callback) Router
 
-1. 在`Acast\Http`中，`$path`为Request URI以"/"为分界符分割后的数组。如果是根目录，则为空数组。如果要将数组的某个成员作为参数捕获，则在其之前加"/"。路由匹配成功后，其值将保存到`$this->params`中。例如，`$path`为\['id', '/id', 'name', '/name'\]，且Request URI为"/id/3/name/foo"时，就会得到`$this->params` = \['id => '3', 'name' => 'foo'\]。
+1. 在`Acast\Http`中，`$path`为Request URI以"/"为分界符分割后的数组。如果是根目录，则为空数组。如果要将数组的某个成员作为参数捕获，则在其之前加"/"。路由匹配成功后，其值将保存到`$this->params`中。例如，`$path`为\['id', '/id', 'name', '/name'\]，且Request URI为"/id/3/name/foo"时，就会得到`$this->params`为"\['id' => '3', 'name' => 'foo'\]"。
 
 2. `$methods`为HTTP请求的方法，包括"POST", "GET", "PUT"等。可以传递一个数组，包含所有需要匹配的方法。若当前不处于HTTP环境，则该参数可以根据情况自定义。
 
@@ -64,11 +64,11 @@
 
 ### TCP转发
 
-有时候，对于某些路由，我们需要转发到提供服务的其他端口，如`npm`的`serve`，此时，我们可以使用`forward()`方法。
+有时候，对于某些路由，我们需要转发到提供服务的其他端口，如npm的serve，此时，我们可以使用`forward()`方法。
 
 > function Router::forward(string $name) void
 
-$name为要转发到的地址的别名，需要在服务启动前使用Config::set\(\)设置，前缀为"FORWARD\_"。例如：
+$name为要转发到的地址的别名，需要在服务启动前使用`Config::set()`设置，前缀为"FORWARD\_"。例如：
 
 ```php
 Config::set('FORWARD_NEW', 'tcp://127.0.0.1:8080');
@@ -77,6 +77,14 @@ Router::instance('demo')->add(['new'], 'GET', function () {
     $this->forward('NEW');
 });
 ```
+
+注意：
+
+1. 对于HTTP转发，当连接建立后，会首先将此次完整的HTTP请求发送到目标地址。`forward()`方法提供第二个参数`$pipe`，是否以管道方式转发。如果为true，则该连接之后的请求将不再通过该HTTP服务的路由。
+
+2. 对于长连接。`forward()`方法默认为pipe方式，而且连接建立后不会自动发送任何数据。
+
+3. 对于Acast\Socket\Enhanced，该方法不受支持。
 
 ### 成员变量说明
 
@@ -104,7 +112,7 @@ Router::instance('demo')->add([], ['GET', 'POST'], function () {
     }
     return false;
 });
-Router::instance('emo')->add(['user'], 'POST', function () {
+Router::instance('demo')->add(['user'], 'POST', function () {
     if ($this->mRet) {
         $this->invoke();
     }

@@ -10,7 +10,7 @@
 
 > function Config::setGlobal(string $key, mixed $value) bool
 
-也可以设置可以在多进程间共享的全局变量（需要配置`memcached`）。
+也可以设置可以在多进程间共享的全局变量（需要配置memcached）。
 
 > function Config::setArray(array $config) void
 

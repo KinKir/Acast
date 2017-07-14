@@ -22,7 +22,7 @@
 
 > static function Controller::addGlobal(array $controllers) void
 
-$controllers的格式同`Router::bind()`，但是不可以省略别名。
+`$controllers`的格式同`Router::bind()`，但是不可以省略别名。
 
 ### 适用于Acast\\Socket的成员函数
 

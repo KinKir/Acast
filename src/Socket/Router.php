@@ -33,6 +33,16 @@ class Router extends \Acast\Router {
         return $this->connection->session[$key];
     }
     /**
+     * {@inheritdoc}
+     */
+    protected function forward(string $name) {
+        parent::forward($name);
+        $remote = $this->connection->remotes[$name];
+        $remote->pipe($this->connection);
+        $this->connection->pipe($remote);
+        $remote->connect();
+    }
+    /**
      * 设置当前客户端连接的Session
      *
      * @param $key

@@ -15,6 +15,12 @@ class Router extends \Acast\Router {
     /**
      * {@inheritdoc}
      */
+    protected function forward(string $name) {
+        Console::warning('Forwarding not supported in \Acast\Socket\Enhanced.');
+    }
+    /**
+     * {@inheritdoc}
+     */
     static function create(string $name) : self {
         parent::create($name);
         return self::$routers[$name] = new self;

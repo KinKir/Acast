@@ -271,9 +271,10 @@ class Router {
     protected function _routerCall() : bool {
         $callback = $this->_pCall[self::_CALLBACK];
         try {
-            return $callback() ?? true;
+            return boolval($callback() ?? true);
         } catch (\PDOException $exception) {
             Worker::log($exception->getMessage());
+            $this->connection->close();
             return false;
         }
     }

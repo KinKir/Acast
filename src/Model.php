@@ -10,6 +10,7 @@ abstract class Model {
     const ALL = 'query';
     const ROW = 'row';
     const SINGLE = 'single';
+    const COLUMN = 'column';
     /**
      * 数据库配置项
      * @var array

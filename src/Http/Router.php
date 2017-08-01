@@ -2,7 +2,7 @@
 
 namespace Acast\Http;
 
-use Workerman\{
+use Workerman\ {
     Connection\TcpConnection
 };
 

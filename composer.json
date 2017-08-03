@@ -21,6 +21,14 @@
   "autoload" : {
     "psr-4" : {
       "Acast\\" : "src"
-    }
+    },
+    "files" : [
+      "src/Http/Constants.php",
+      "src/Http/Misc.php",
+      "src/Socket/Constants.php",
+      "src/Socket/Misc.php",
+      "src/Socket/Enhanced/Constants.php",
+      "src/Socket/Enhanced/Misc.php"
+    ]
   }
 }

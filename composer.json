@@ -1,0 +1,24 @@
+{
+  "name" : "cismonx/acast",
+  "type" : "library",
+  "license" : "MIT",
+  "description" : "The simplest web framework you've ever seen.",
+  "keywords" : [
+    "framework", "socket", "acast"
+  ],
+  "authors" : [
+    {
+      "name" : "CismonX",
+      "email" : "admin@cismon.net"
+    }
+  ],
+  "require" : {
+    "cismonx/workerman" : "^0.1",
+    "cismonx/gateway-worker" : "^0.1"
+  },
+  "autoload" : {
+    "psr-4" : {
+      "Acast\\" : "src"
+    }
+  }
+}

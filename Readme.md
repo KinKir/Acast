@@ -28,10 +28,10 @@ Acast是一个轻量级的Web框架。
 
 #### 使用Acast框架
 
-1. 下载源码。像如下所示将Acast包含在你的项目中。
+1. 使用composer将Acast添加到项目中。
 
-```php
-require_once __DIR__ . '/Acast/.php';
+```bash
+composer require cismonx/acast
 ```
 
 2. 使用Acast优雅地实现你的业务逻辑。

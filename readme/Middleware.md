@@ -4,7 +4,7 @@
 
 ### 注册中间件
 
-> static function Middleware::register(string $name, callable $callback) void
+> static function Middleware::register(string \$name, callable \$callback) void
 
 1. `$name`为中间件的名称。
 
@@ -12,7 +12,7 @@
 
 ### 绑定路由
 
-> function Router::middleware(mixed $names) Router
+> function Router::middleware(mixed \$names) Router
 
 `$names`为一个数组或字符串，指定的中间件将被依次调用，除非某个回调返回`false`。
 

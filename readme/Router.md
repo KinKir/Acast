@@ -4,15 +4,15 @@
 
 ### 注册路由
 
-> static function Router::create(string $name) Router
+> static function Router::create(string \$name) Router
 
 根据路由名称创建路由实例。返回新实例。创建的实例也可以由以下方法获取：
 
-> static function Router::instance(string $name) Router
+> static function Router::instance(string \$name) Router
 
 ### 添加路由
 
-> function Router::add(?array $path, $methods, callable $callback) Router
+> function Router::add(?array \$path, \$methods, callable \$callback) Router
 
 1. 在`Acast\Http`中，`$path`为Request URI以"/"为分界符分割后的数组。如果是根目录，则为空数组。如果要将数组的某个成员作为参数捕获，则在其之前加"/"。路由匹配成功后，其值将保存到`$this->params`中。例如，`$path`为\['id', '/id', 'name', '/name'\]，且Request URI为"/id/3/name/foo"时，就会得到`$this->params`为"\['id' => '3', 'name' => 'foo'\]"。
 
@@ -24,7 +24,7 @@
 
 ### 绑定控制器
 
-> function Router::bind(array $controllers) Router 
+> function Router::bind(array \$controllers) Router 
 
 1. 一个路由可以绑定多个控制器，`$controller`为数组，可以为单个控制器或多个控制器，格式为\[string $name, string $controller, string $method\]。
 
@@ -38,8 +38,8 @@
 
 若一个路由绑定了控制器，则可以在回调函数中用以下方法调用。该类的构造函数会先被调用，然后是指定的方法。
 
-> function Router::invoke(string $name, $param = null) mixed 
-  
+> function Router::invoke(string \$name, \$param = null) mixed 
+
 可以向控制器方法传递一个参数，也可以获取控制器方法的返回值。
 
 ### 绑定中间件
@@ -48,13 +48,13 @@
 
 ### 路由别名
 
-> function Router::alias(mixed $name) Router
+> function Router::alias(mixed \$name) Router
 
 `$name`为你将要给该路由设置的别名（以数组的形式可以同时设置多个别名）。给路由设置别名后可以实现路由的分发。
 
 ### 路由分发
 
-> function Router::dispatch($name) bool
+> function Router::dispatch(\$name) bool
 
 分发到指定别名的路由。指定的路由的回调函数将被调用。
 
@@ -66,7 +66,7 @@
 
 有时候，对于某些路由，我们需要转发到提供服务的其他端口，如npm的serve，此时，我们可以使用`forward()`方法。
 
-> function Router::forward(string $name) void
+> function Router::forward(string \$name) void
 
 $name为要转发到的地址的别名，需要在服务启动前使用`Config::set()`设置，前缀为"FORWARD\_"。例如：
 
@@ -84,7 +84,7 @@ Router::instance('demo')->add(['new'], 'GET', function () {
 
 2. 对于长连接。`forward()`方法默认为pipe方式，而且连接建立后不会自动发送任何数据。
 
-3. 对于Acast\Socket\Enhanced，该方法不受支持。
+3. 对于`Acast\Socket\Enhanced`，该方法不受支持。
 
 ### 成员变量说明
 
@@ -103,8 +103,8 @@ Router::instance('demo')->add(['new'], 'GET', function () {
 ### 示例
 
 ```php
-Router::create('demo');
-Router::instance('demo')->add([], ['GET', 'POST'], function () {
+$router = Router::create('demo');
+$router->add([], ['GET', 'POST'], function () {
     if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $this->dispatch('user');
     } else {
@@ -112,7 +112,7 @@ Router::instance('demo')->add([], ['GET', 'POST'], function () {
     }
     return false;
 });
-Router::instance('demo')->add(['user'], 'POST', function () {
+$router->add(['user'], 'POST', function () {
     if ($this->mRet) {
         $this->invoke();
     }

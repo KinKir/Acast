@@ -10,7 +10,7 @@
 
 ### 注册视图
 
-> static function View::register(string $name, $data, bool $use_memcached = false) void
+> static function View::register(string \$name, \$data, bool \$use_memcached = false) void
 
 1. `$name`为视图名。
 
@@ -20,7 +20,7 @@
 
 ### 取出视图
 
-> function View::fetch(string $name) View
+> function View::fetch(string \$name) View
 
 > function View::show() void
 

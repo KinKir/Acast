@@ -14,7 +14,9 @@
   ],
   "require" : {
     "cismonx/workerman" : "^0.1",
-    "cismonx/gateway-worker" : "^0.1"
+    "cismonx/gateway-worker" : "^0.1",
+    "ext-pdo_mysql" : "*",
+    "ext-memcached" : "*"
   },
   "autoload" : {
     "psr-4" : {

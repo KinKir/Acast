@@ -8,7 +8,7 @@
 
 Acast还提供了控制台函数的注册接口，如下：
 
-> static function Console::register(string $name, callable $callback) void
+> static function Console::register(string \$name, callable \$callback) void
 
 注册后，可以在执行入口文件时带上参数，调用相对应的函数。比如，你注册了一个名为clear的函数，你可以以如下方式调用：
 
@@ -40,6 +40,6 @@ Workerman提供了对`$_SESSION`的支持，使用前需要调用`Http::sessionS
 
 ### Workerman
 
-注意，官方版本的Workerman无法在Acast中直接使用。
+注意，官方版本的Workerman和GatewayWorker无法在Acast中直接使用。
 
-建议使用本项目内附带的Workerman，该Workerman的分支会随时更新，并不断被修改优化以适应于Acast的Web开发。
+本项目使用的修改版Workerman和GatewayWorker会随着主分支更新，并不断被修改优化以适应于Acast。

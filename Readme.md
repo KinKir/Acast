@@ -20,9 +20,9 @@ Acast是一个轻量级的Web框架。
 
 1. Acast依赖[Workerman](http://www.workerman.net/)提供HTTP服务。需要在项目中包含最新的Workerman源码。
 
-2. Acast和Workerman依赖PHP的一些扩展，包括pcntl、posix和memcached。某些特性，如posix threads，是Linux独有的。这意味着你无法在Windows上使用本框架。
+2. Acast和Workerman依赖PHP的一些扩展，包括pcntl、posix和memcached。某些特性，如fork，是Linux独有的。这意味着你无法在Windows上使用本框架（如果有需要，可以自行修改Windows版本的Workerman）。
 
-3. 你或许需要考虑安装[vent扩展](https://pecl.php.net/package/event)来提高Workerman的性能。
+3. 你或许需要考虑安装[event扩展](https://pecl.php.net/package/event)来提高Workerman的性能。
 
 4. Acast框架依赖较新版本的PHP(7.1.0及以上)，这是由于该框架对nullable和`Closure::fromCallable()`等特性的使用。
 
@@ -48,7 +48,7 @@ php /Applications/main.php start -d
 
 #### 服务提供者
 
-每一个服务提供者是一个独立的应用示例，它监听一个指定的端口，负责接收并处理客户端的请求。
+每一个服务提供者是一个独立的应用实例，它监听一个指定的端口，负责接收并处理客户端的请求。
 
 请求处理完毕后，服务提供者将数据返回给客户端，并断开连接。
 

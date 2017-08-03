@@ -4,7 +4,7 @@
 
 ### 新建Migrate实例
 
-> static function Migrate::create(string $name, array $settings, string $sql_path) void
+> static function Migrate::create(string \$name, array \$settings, string \$sql_path) void
 
 新建一个Migrate实例。
 
@@ -14,11 +14,11 @@
 
 ### 获取Migrate实例
 
-> static function Migrate::instance(string $name) Migrate
+> static function Migrate::instance(string \$name) Migrate
 
 ### 执行迁移操作
 
-> function Migrate::execute(array $replace) void
+> function Migrate::execute(array \$replace) void
 
 其中，`$replace`为key-value型数组。key为待替换的字段名，value为替换后的字符串。替换后，SQL文件中的语句将被执行。
 

@@ -12,7 +12,7 @@ Acast提供了对Workerman的GatewayWorker组件的封装，用于便捷地实�
 
 GatewayWorker类库由三类Worker构成提供服务：Gateway，BusinessWorker与Register。
 
-> static function Server::create(string $app, ?string $listen = null, ?array $ssl = null, bool $businessWorker = true) Server
+> static function Server::create(string \$app, ?string \$listen = null, ?array \$ssl = null, bool \$businessWorker = true) Server
 
 1. `$listen`为监听的地址。若为null，则不会创建`Gateway`。可以自定义协议，这一点和`Acast\Socket`相同。
 
@@ -28,7 +28,7 @@ GatewayWorker类库由三类Worker构成提供服务：Gateway，BusinessWorker�
 
 `GatewayWorker\Register`用于建立Gateway与BusinessWorker之间的连接，使用基于TCP的text协议（换行符分包）。
 
-> static function Server::addRegister(string $name, string $listen) void
+> static function Server::addRegister(string \$name, string \$listen) void
 
 1. `$name`为Worker的名称。
 
@@ -62,15 +62,15 @@ GatewayWorker类库由三类Worker构成提供服务：Gateway，BusinessWorker�
 
 Acast还封装了少量的方法，下面会有说明。此外，开发者可以根据实际需要，自行在控制器中封装相应方法。
 
-> static function Controller::send($data, $client_id = null) bool
+> static function Controller::send(\$data, \$client_id = null) bool
 
 向目标客户端发送消息，如果`$client_id`为null，则发送给当前用户。
 
-> static function Controller::close($data = null, $client_id = null) bool
+> static function Controller::close(\$data = null, \$client_id = null) bool
 
 发送消息并关闭客户端连接。
 
-> static function Controller::lock(?callable $callback = null) void
+> static function Controller::lock(?callable \$callback = null) void
 
 锁定客户端，之后用户发送的请求不会通过onMessage回调以及路由，而是仅执行提供的回调`$callback`。若`$callback`为null，则不会执行任何回调。
 

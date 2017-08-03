@@ -4,11 +4,11 @@
 
 ### 创建/删除服务
 
-> static function Cron::create(string $name, int $interval) void
+> static function Cron::create(string \$name, int \$interval) void
 
 在当前进程创建一个计划任务服务。`$name`为服务名称，`$interval`为计划任务的执行间隔。
 
-> static function Cron::destroy(string $name) void
+> static function Cron::destroy(string \$name) void
 
 删除指定的计划任务服务，与其绑定的计划任务会全部销毁。
 
@@ -22,13 +22,13 @@
 
 ### 获取服务实例
 
-> static function Cron::instance(string $name) Cron
+> static function Cron::instance(string \$name) Cron
 
 根据服务名获取实例。
 
 ### 添加/删除计划任务
 
-> function Cron::add(string $name, int $when, callable $callback, $param = null, bool $persistent) void
+> function Cron::add(string \$name, int \$when, callable \$callback, \$param = null, bool \$persistent) void
 
 1. `$name`为计划任务名称
 
@@ -42,7 +42,7 @@
 
 注意：避免在用于网络IO的进程中添加高耗时的计划任务，否则会导致阻塞。
 
-> function Cron::del(string $name) void
+> function Cron::del(string \$name) void
 
 以上方法用于删除计划任务。
 

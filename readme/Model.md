@@ -10,7 +10,7 @@
 
 ### 配置数据库
 
-> static function Model::config(array $config) void
+> static function Model::config(array \$config) void
 
 `$config`为MySQL配置数据，格式为`[$host, $port, $user, $password, $db_name, $charset]`。
 
@@ -26,18 +26,18 @@
 
 `Acast\Model`提供了一些便捷的方法，方便进行一些基本的CURD操作。
 
-> protected function Model::_select($cols, $where = null, ?array $bind = null, ?array $order_by = null, ?array $limit = null) mixed
+> protected function Model::_select(\$cols, \$where = null, ?array \$bind = null, ?array \$order_by = null, ?array \$limit = null) mixed
 
-> protected function Model::_insert(array $cols, ?array $bind = null, bool $ignore = false) mixed
+> protected function Model::_insert(array \$cols, ?array \$bind = null, bool \$ignore = false) mixed
 
-> protected function Model::_update($cols, $where = null, ?array $bind = null, ?int $limit = null) mixed
+> protected function Model::_update(\$cols, \$where = null, ?array \$bind = null, ?int \$limit = null) mixed
 
-> protected function Model::_delete($where = null, ?array $bind = null, ?int $limit = null) mixed
+> protected function Model::_delete(\$where = null, ?array \$bind = null, ?int \$limit = null) mixed
 
 以上操作需要通过`Model::table()`方法绑定数据表。一般来说，一个控制器不止操作一个数据表，因此，这个方法不是十分实用。
 
 由于数据库连接的实例是静态成员，因此，可以将某些可能被多个控制器调用的方法定义为静态方法，方便被其他模型调用。
 
-> protected static function Model::_in($col, array $arr) string
+> protected static function Model::_in(\$col, array \$arr) string
 
 以上方法用于构造"WHERE IN"语句块。参见源码。
